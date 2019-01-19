@@ -17,12 +17,13 @@
 #' @export
 #' @examples
 #'
-#' \donttest{
+#' \dontrun{
 #' # set key
 #' wf_set_key(email = "test@mail.com", key = "123")
 #'
-#' # get key
-#' wf_get_key(email = "test@mail.com")
+#' # request data and grab url and try a transfer
+#' r <- wf_request("test@email.com")
+#' wf_transfer("test@email.com", url = r$href)
 #'}
 
 wf_transfer <- function(
@@ -65,7 +66,7 @@ wf_transfer <- function(
   ct <- httr::content(response)
 
   # write raw data to file from memory
-  # if not return url + passing code
+  # if not returned url + passing code
   if (class(ct) == "raw"){
 
     if(verbose){
@@ -80,9 +81,11 @@ wf_transfer <- function(
 
     # return element to exit while loop, including
     # the url to close the connection
-    return(data.frame(code = "downloaded",
+    invisible(
+      return(data.frame(code = "downloaded",
                       href = url,
                       stringsAsFactors = FALSE))
+    )
   } else {
    return(ct)
   }

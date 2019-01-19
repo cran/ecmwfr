@@ -56,47 +56,47 @@ cran <- check_cran()
 #  # "XXXXXXXXXXXXXXXXXXXXXX"
 
 ## ----eval = cran---------------------------------------------------------
-#  # user info
-#  user_info <- wf_user_info(email = "khrdev@outlook.com")
-#  head(user_info)
-#  
-#  # services
-#  services <- wf_services(email = "khrdev@outlook.com")
-#  head(services)
-#  
-#  # datasets
-#  datasets <- wf_datasets(email = "khrdev@outlook.com")
-#  head(datasets)
+# user info
+user_info <- wf_user_info(email = "khrdev@outlook.com")
+head(user_info)
+
+# services
+services <- wf_services(email = "khrdev@outlook.com")
+head(services)
+
+# datasets
+datasets <- wf_datasets(email = "khrdev@outlook.com")
+head(datasets)
 
 ## ----eval = cran---------------------------------------------------------
-#  # this is an example of a request
-#  my_request <- list(stream = "oper",
-#                    levtype = "sfc",
-#                    param = "167.128",
-#                    dataset = "interim",
-#                    step = "0",
-#                    grid = "0.75/0.75",
-#                    time = "00",
-#                    date = "2014-07-01/to/2014-07-31",
-#                    type = "an",
-#                    class = "ei",
-#                    area = "73.5/-27/33/45",
-#                    format = "netcdf",
-#                    target = "tmp.nc")
-#  
-#  # an example download using fw_request()
-#  # using the above request list()
-#  wf_request(
-#    email = "khrdev@outlook.com",
-#    transfer = TRUE,
-#    path = "~",
-#    request = my_request,
-#    verbose = FALSE)
+# this is an example of a request
+my_request <- list(stream = "oper",
+                  levtype = "sfc",
+                  param = "167.128",
+                  dataset = "interim",
+                  step = "0",
+                  grid = "0.75/0.75",
+                  time = "00",
+                  date = "2014-07-01/to/2014-07-31",
+                  type = "an",
+                  class = "ei",
+                  area = "73.5/-27/33/45",
+                  format = "netcdf",
+                  target = "tmp.nc")
+
+# an example download using fw_request()
+# using the above request list()
+wf_request(
+  email = "khrdev@outlook.com",
+  transfer = TRUE,
+  path = "~",
+  request = my_request,
+  verbose = FALSE)
 
 ## ----fig.width = 7, fig.height = 7, eval = cran--------------------------
-#  s <- raster::stack("~/tmp.nc")
-#  print(s)
-#  
-#  raster::plot(s[[1]], main = "2 meter temperature (Kelvin)")
-#  maps::map("world", add = TRUE)
+s <- raster::stack("~/tmp.nc")
+print(s)
+
+raster::plot(s[[1]], main = "2 meter temperature (Kelvin)")
+maps::map("world", add = TRUE)
 
