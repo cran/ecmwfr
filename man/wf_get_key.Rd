@@ -2,12 +2,12 @@
 % Please edit documentation in R/wf_get_key.R
 \name{wf_get_key}
 \alias{wf_get_key}
-\title{Get secret ECMWF token}
+\title{Get secret ECMWF / CDS token}
 \usage{
-wf_get_key(email)
+wf_get_key(user)
 }
 \arguments{
-\item{email}{email address used to sign up for the ECMWF data service}
+\item{user}{user (email address) used to sign up for the ECMWF data service}
 }
 \value{
 the key set using \code{\link[ecmwfr]{wf_set_key}} saved
@@ -20,14 +20,17 @@ Returns you token set by \code{\link[ecmwfr]{wf_set_key}}
 
 \dontrun{
 # set key
-wf_set_key(email = "test@mail.com", key = "123")
+wf_set_key(user = "test@mail.com", key = "123")
 
 # get key
-wf_get_key(email = "test@mail.com")
+wf_get_key(user = "test@mail.com")
 }
 }
 \seealso{
 \code{\link[ecmwfr]{wf_set_key}}
+}
+\author{
+Koen Kufkens
 }
 \keyword{key}
 \keyword{management}

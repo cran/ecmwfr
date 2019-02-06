@@ -13,7 +13,7 @@ my_request <- list(stream = "oper",
                    date = "2014-07-01/to/2014-07-31",
                    type = "an",
                    class = "ei",
-                   area = "73.5/-27/33/45",
+                   area = "51/0/50/1",
                    format = "netcdf",
                    target = "tmp.nc")
 
@@ -23,7 +23,7 @@ my_request <- list(stream = "oper",
 # additional check below)
 key <- system("echo $KEY", intern = TRUE)
 if(key != "" & key != "$KEY"){
-  wf_set_key(email = "khrdev@outlook.com",
+  wf_set_key(user = "khrdev@outlook.com",
              key = system("echo $KEY", intern = TRUE))
 }
 rm(key)
@@ -35,20 +35,25 @@ rm(key)
 # environmental variables (hence fail to retrieve the api key).
 # This also allows for very basic checks on r-hub.
 # No checks should be skiped on either Travis CI or OSX.
-skip_check <- try(wf_get_key(email = "khrdev@outlook.com"))
-skip_check <- inherits(skip_check, "try-error")
+login_check <- try(wf_get_key(user = "khrdev@outlook.com"), silent = TRUE)
+login_check <- inherits(login_check, "try-error")
+server_check <- !ecmwf_running(wf_server(service = "webapi"))
+
+print(login_check)
 
 # check keychain management
 test_that("set, get secret key",{
-  skip_if(skip_check)
-  expect_silent(wf_set_key(email = "johndoe@hotmail.com",
+  skip_if(login_check)
+  skip_if(server_check)
+  expect_silent(wf_set_key(user = "johndoe@hotmail.com",
                            key = "XXX"))
-  expect_output(str(wf_get_key(email = "johndoe@hotmail.com")))
+  expect_output(str(wf_get_key(user = "johndoe@hotmail.com")))
 })
 
 test_that("test dataset function", {
-  skip_if(skip_check)
-  expect_output(str(wf_datasets(email = "khrdev@outlook.com")))
+  skip_if(login_check)
+  skip_if(server_check)
+  expect_output(str(wf_datasets(user = "khrdev@outlook.com")))
 })
 
 test_that("test dataset function - no login", {
@@ -56,8 +61,9 @@ test_that("test dataset function - no login", {
 })
 
 test_that("test services function", {
-  skip_if(skip_check)
-  expect_output(str(wf_services(email = "khrdev@outlook.com")))
+  skip_if(login_check)
+  skip_if(server_check)
+  expect_output(str(wf_services(user = "khrdev@outlook.com")))
 })
 
 test_that("test services function - no login", {
@@ -65,8 +71,9 @@ test_that("test services function - no login", {
 })
 
 test_that("test user info function", {
-  skip_if(skip_check)
-  expect_output(str(wf_user_info(email = "khrdev@outlook.com")))
+  skip_if(login_check)
+  skip_if(server_check)
+  expect_output(str(wf_user_info(user = "khrdev@outlook.com")))
 })
 
 test_that("test user info function - no login", {
@@ -74,32 +81,35 @@ test_that("test user info function - no login", {
 })
 
 test_that("test request (transfer) function", {
-  skip_if(skip_check)
+  skip_if(login_check)
+  skip_if(server_check)
   expect_message(wf_request(
-    email = "khrdev@outlook.com",
+    user = "khrdev@outlook.com",
     transfer = TRUE,
     request = my_request,
     time_out = 60))
 })
 
 test_that("test request (transfer) function - time out", {
-  skip_if(skip_check)
+  skip_if(login_check)
+  skip_if(server_check)
   expect_output(str(wf_request(
-    email = "khrdev@outlook.com",
+    user = "khrdev@outlook.com",
     transfer = TRUE,
     request = my_request,
     time_out = 1)))
 })
 
 test_that("test request (transfer) function - no transfer", {
-  skip_if(skip_check)
+  skip_if(login_check)
+  skip_if(server_check)
   ct <- wf_request(
-    email = "khrdev@outlook.com",
+    user = "khrdev@outlook.com",
     transfer = FALSE,
     request = my_request)
 
   expect_output(str(ct))
-  expect_message(wf_delete(email = "khrdev@outlook.com",
+  expect_message(wf_delete(user = "khrdev@outlook.com",
                            url = ct$href))
 })
 
@@ -112,12 +122,15 @@ test_that("test transfer function - no login", {
 })
 
 test_that("test request (transfer) function", {
-  skip_if(skip_check)
-  expect_message(wf_request(
-    email = "khrdev@outlook.com",
+  skip_if(login_check)
+  skip_if(server_check)
+  expect_message(
+    wf_request(
+    user = "khrdev@outlook.com",
     transfer = TRUE,
     request = my_request,
-    time_out = 180))
+    time_out = 180)
+    )
 })
 
 test_that("test delete function - no login", {
@@ -125,7 +138,8 @@ test_that("test delete function - no login", {
 })
 
 test_that("test request (transfer) function - larger download", {
-  skip_if(skip_check)
+  skip_if(login_check)
+  skip_if(server_check)
 
   # large request
   large_request <- list(stream = "oper",
@@ -143,7 +157,7 @@ test_that("test request (transfer) function - larger download", {
                  target = "tmp.nc")
 
   expect_message(wf_request(
-    email = "khrdev@outlook.com",
+    user = "khrdev@outlook.com",
     transfer = TRUE,
     request = large_request,
     time_out = 300))

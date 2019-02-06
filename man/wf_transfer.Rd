@@ -4,20 +4,25 @@
 \alias{wf_transfer}
 \title{ECMWF data transfer function}
 \usage{
-wf_transfer(email, url, path = tempdir(), filename = "ecmwf_tmp.nc",
+wf_transfer(user, url, service = "webapi", path = tempdir(),
+  filename = tempfile("ecmwfr_", fileext = ".nc", tmpdir = ""),
   verbose = TRUE)
 }
 \arguments{
-\item{email}{email address used to sign up for the ECMWF data service and
-used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}}
+\item{user}{user (email address) used to sign up for the ECMWF data service,
+used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}.}
 
 \item{url}{url to query}
+
+\item{service}{which service to use, one of \code{webapi} or \code{cds}}
 
 \item{path}{path were to store the downloaded data}
 
 \item{filename}{filename to use for the downloaded data}
 
 \item{verbose}{show feedback on data transfers}
+
+\item{...}{forwarded to \code{\link[ecmwfr]{wf_transfer}}}
 }
 \value{
 a netCDF of data on disk as specified by a
@@ -31,16 +36,21 @@ to disk or the current status of the requested transfer.
 
 \dontrun{
 # set key
-wf_set_key(email = "test@mail.com", key = "123")
+wf_set_key(user = "test@mail.com", key = "123")
 
 # request data and grab url and try a transfer
-r <- wf_request("test@email.com")
+r <- wf_request("test@email.com", transfer = FALSE)
+
+# check transfer, will download if available
 wf_transfer("test@email.com", url = r$href)
 }
 }
 \seealso{
 \code{\link[ecmwfr]{wf_set_key}}
 \code{\link[ecmwfr]{wf_request}}
+}
+\author{
+Koen Kufkens
 }
 \keyword{climate,}
 \keyword{data}
