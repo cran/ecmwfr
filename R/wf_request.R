@@ -2,8 +2,7 @@
 #'
 #' Stage a data request, and optionally download the data to disk. Alternatively
 #' you can only stage requests, logging the request URLs to submit download
-#' queries later on using \code{\link[ecmwfr]{wf_transfer}}. The function only
-#' allows NetCDF downloads, and will override calls for grib data.
+#' queries later on using \code{\link[ecmwfr]{wf_transfer}}.
 #' Note that the function will do some basic checks on the \code{request} input
 #' to identify possible problems.
 #'
@@ -12,12 +11,12 @@
 #' @param path path were to store the downloaded data
 #' @param time_out how long to wait on a download to start (default =
 #' \code{3*3600} seconds).
-#' @param transfer logical, download data TRUE or FALSE (default = FALSE)
+#' @param transfer logical, download data TRUE or FALSE (default = TRUE)
 #' @param request nested list with query parameters following the layout
 #' as specified on the ECMWF API page
 #' @param verbose show feedback on processing
-#' @return a download query staging url or (invisible) filename of the NetCDF
-#' file on your local disc
+#' @return a download query staging url or (invisible) filename of the file on
+#' your local disc
 #' @keywords data download, climate, re-analysis
 #' @seealso \code{\link[ecmwfr]{wf_set_key}}
 #' \code{\link[ecmwfr]{wf_transfer}}
@@ -43,26 +42,29 @@
 #'    format = "netcdf",
 #'    target = "tmp.nc")
 #'
-#' # get the default test data
-#' wf_request(user = "test@mail.com", request = request)
+#' # demo query
+#' wf_request(request = request, user = "test@mail.com")
 #'}
 
 wf_request <- function(
-  user,
   request,
-  transfer = FALSE,
+  user,
+  transfer = TRUE,
   path = tempdir(),
-  time_out = 3*3600,
+  time_out = 3600,
   verbose = TRUE
   ){
+
+  if(!is.list(request) | is.character(request)) {
+    stop("`request` must be a named list. \n",
+         "If you are passing the user as first argument, notice that argument ",
+         "order was changed in version 1.1.1.")
+  }
 
   # check the login credentials
   if(missing(user) || missing(request)){
     stop("Please provide ECMWF or CDS login credentials and data request!")
   }
-
-  # get key
-  key <- wf_get_key(user)
 
   # checks user login, the request layout and
   # returns the service to use if successful
@@ -71,6 +73,9 @@ wf_request <- function(
   # split out data
   service <- wf_check$service
   url <- wf_check$url
+
+  # get key
+  key <- wf_get_key(user = user, service = service)
 
   # getting api url: different handling if 'dataset = "mars"',
   # requests to 'dataset = "mars"' require a non-public user
@@ -143,7 +148,7 @@ wf_request <- function(
 
   # Temporary file name, will be used in combination with tempdir() when
   # calling wf_transfer.
-  tmp_file <- basename(tempfile("ecmwfr_", fileext = ".nc"))
+  tmp_file <- basename(tempfile("ecmwfr_"))
 
   # keep waiting for the download order to come online
   # with status code 303. 202 = connection accepted, but job queued.
@@ -178,9 +183,9 @@ wf_request <- function(
     # attempt a download. Use 'input_user', can also
     # be NULL (load user information from '.ecmwfapirc'
     # file inside wf_transfer).
-    ct <- wf_transfer(user    = user,
-                      url     = ifelse(service == "cds",
-                                        ct$request_id, ct$href),
+    ct <- wf_transfer(url = ifelse(service == "cds",
+                      ct$request_id, ct$href),
+                      user    = user,
                       service  = service,
                       filename = tmp_file,
                       verbose  = verbose)
@@ -194,12 +199,20 @@ wf_request <- function(
     src <- file.path(tempdir(), tmp_file)
     dst <- file.path(path, request$target)
 
+    # rename / move file
+    move <- suppressWarnings(file.rename(src, dst))
+
+    # check if the move was succesful
+    # fails for separate disks/partitions
+    # then copy and remove
+    if(!move){
+      file.copy(src, dst, overwrite = TRUE)
+      file.remove(src)
+    }
+
     if ( verbose ){
       message(sprintf("- moved temporary file to -> %s", dst))
     }
-
-    # rename / move file
-    file.rename(src, dst)
 
   } else {
     dst <- file.path(path, tmp_file)

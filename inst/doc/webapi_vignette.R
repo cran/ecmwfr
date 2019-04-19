@@ -17,7 +17,8 @@ library(ecmwfr)
 key <- system("echo $KEY", intern = TRUE)
 if(key != "" & key != "$KEY"){
   wf_set_key(user = "khrdev@outlook.com",
-             key = system("echo $KEY", intern = TRUE))
+             key = key,
+             service = "webapi")
 }
 rm(key)
 
@@ -40,7 +41,8 @@ cran <- check_cran()
 ## ----eval = FALSE--------------------------------------------------------
 #  # set a key to the keychain
 #  wf_set_key(user = "khrdev@outlook.com",
-#             key = "XXXXXXXXXXXXXXXXXXXXXX")
+#             key = "XXXXXXXXXXXXXXXXXXXXXX",
+#             service = "webapi")
 #  
 #  # you can retrieve the key using
 #  wf_get_key(user = "khrdev@outlook.com")
@@ -48,6 +50,10 @@ cran <- check_cran()
 #  # the output should be the key you provided
 #  # in this case represented by the fake X string.
 #  # "XXXXXXXXXXXXXXXXXXXXXX"
+
+## ----eval = FALSE--------------------------------------------------------
+#  # set a key to the keychain
+#  wf_set_key(service = "webapi")
 
 ## ----eval = FALSE, message=FALSE, warning=FALSE--------------------------
 #  # this is an example of a request
@@ -77,11 +83,11 @@ cran <- check_cran()
 ncfile <- system.file(package = "ecmwfr","extdata/webapi.nc")
 
 ## ----fig.width = 7, fig.height = 7, eval = cran--------------------------
-s <- raster::stack(ncfile)
-print(s)
-
-raster::plot(s[[1]], main = "2 meter temperature (Kelvin)")
-maps::map("world", add = TRUE)
+#  s <- raster::stack(ncfile)
+#  print(s)
+#  
+#  raster::plot(s[[1]], main = "2 meter temperature (Kelvin)")
+#  maps::map("world", add = TRUE)
 
 ## ----mars example, eval = FALSE------------------------------------------
 #  # this is an example of a request
@@ -108,15 +114,15 @@ maps::map("world", add = TRUE)
 #             verbose  = FALSE)
 
 ## ----eval = cran---------------------------------------------------------
-# user info
-user_info <- wf_user_info(user = "khrdev@outlook.com")
-head(user_info)
-
-# services
-services <- wf_services(user = "khrdev@outlook.com")
-head(services)
-
-# datasets
-datasets <- wf_datasets(user = "khrdev@outlook.com")
-head(datasets)
+#  # user info
+#  user_info <- wf_user_info(user = "khrdev@outlook.com")
+#  head(user_info)
+#  
+#  # services
+#  services <- wf_services(user = "khrdev@outlook.com")
+#  head(services)
+#  
+#  # datasets
+#  datasets <- wf_datasets(user = "khrdev@outlook.com")
+#  head(datasets)
 

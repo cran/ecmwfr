@@ -4,15 +4,14 @@
 \alias{wf_transfer}
 \title{ECMWF data transfer function}
 \usage{
-wf_transfer(user, url, service = "webapi", path = tempdir(),
-  filename = tempfile("ecmwfr_", fileext = ".nc", tmpdir = ""),
-  verbose = TRUE)
+wf_transfer(url, user, service = "webapi", path = tempdir(),
+  filename = tempfile("ecmwfr_"), verbose = TRUE)
 }
 \arguments{
+\item{url}{url to query}
+
 \item{user}{user (email address) used to sign up for the ECMWF data service,
 used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}.}
-
-\item{url}{url to query}
 
 \item{service}{which service to use, one of \code{webapi} or \code{cds}}
 
@@ -39,10 +38,10 @@ to disk or the current status of the requested transfer.
 wf_set_key(user = "test@mail.com", key = "123")
 
 # request data and grab url and try a transfer
-r <- wf_request("test@email.com", transfer = FALSE)
+r <- wf_request(request, "test@email.com", transfer = FALSE)
 
 # check transfer, will download if available
-wf_transfer("test@email.com", url = r$href)
+wf_transfer(r$href, "test@email.com")
 }
 }
 \seealso{

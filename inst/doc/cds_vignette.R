@@ -29,13 +29,13 @@ request <- list("dataset"        = "reanalysis-era5-pressure-levels",
 #  ncfile <- wf_request(user = "2088",
 #                        request = request,
 #                        transfer = TRUE,
-#                        path = tempdir(),
+#                        path = "~",
 #                        verbose = FALSE)
 
 ## ----echo = FALSE--------------------------------------------------------
 ncfile <- system.file(package = "ecmwfr","extdata/cds.nc")
 
-## ----spatial-plot, echo = FALSE, figure = TRUE, fig.width = 8, fig.height = 6----
+## ----spatial-plot, echo = TRUE, figure = TRUE, fig.width = 8, fig.height = 6----
 # Open NetCDF file and plot
 r <- raster::raster(ncfile)
 raster::plot(r, main = "ERA-5 Reanalysis Demo (2m Temperature 850 hPa)")

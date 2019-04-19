@@ -1,3 +1,5 @@
+# Returns server URL
+#
 # Returns the url of the data servers for downloading
 # public ECMWF data sets or data sets for the Copernicus CDS.
 #
@@ -76,7 +78,7 @@ exit_message <- function(url, service, path, file){
     "  Visit https://apps.ecmwf.int/webmars/joblist/",
     "  Visit https://cds.climate.copernicus.eu/cdsapp#!/yourrequests")
 
-  intro <-  paste(
+  intro <- paste(
     "Even after exiting your request is still beeing processed!",
     job_list,
     "  to manage (download, retry, delete) your requests",
@@ -84,7 +86,8 @@ exit_message <- function(url, service, path, file){
 
   options <- paste(
     "- Retry downloading as soon as as completed:\n",
-    "  wf_transfer(<user>,\n url = '",url,
+    "  wf_transfer(url = '",url, "\n",
+    "<user>,\n ",
     "',\n path = '",path,
     "',\n filename = '",file,
     "',\n service = \'", service,"')\n\n",
@@ -119,3 +122,49 @@ ecmwf_running <- function(url){
   }
 }
 
+# builds keychain service name from service
+make_key_service <- function(service) {
+  paste("ecmwfr", service, sep = "_")
+}
+
+# gets url where to get API key
+wf_key_page <- function(service) {
+  switch(service,
+         webapi = "https://api.ecmwf.int/v1/key/",
+         cds = "https://cds.climate.copernicus.eu/user/login?destination=user")
+}
+
+# checks credentials
+wf_check_login <- function(user, key, service) {
+  if (service == "webapi") {
+    info <- httr::GET(
+      paste0(wf_server(),
+             "/who-am-i"),
+      httr::add_headers(
+        "Accept" = "application/json",
+        "Content-Type" = "application/json",
+        "From" = user,
+        "X-ECMWF-KEY" = key),
+      encode = "json"
+    )
+    return(!httr::http_error(info) && (httr::content(info)$uid == user))
+  }
+
+  if (service == "cds") {
+    url <- paste0(wf_server(service = "cds"),"/tasks/")
+    ct <- httr::GET(url, httr::authenticate(user, key))
+    return(httr::status_code(ct) < 400)
+  }
+}
+
+# build an archetype from arguments and body (either list or expression)
+new_archetype <- function(args, body) {
+  if (is.list(body)) {
+    body_exp <- rlang::expr(list())
+    body_exp[names(body)] <- body
+    body <- body_exp
+  }
+  f <- rlang::new_function(args, body)
+  class(f) <- c("ecmwfr_archetype", class(f))
+  f
+}
