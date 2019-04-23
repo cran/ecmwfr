@@ -17,30 +17,27 @@ my_request <- list(stream = "oper",
                    format = "netcdf",
                    target = "tmp.nc")
 
-# set password using encrypted key
-# if provided, otherwise just continue
-# assuming a valid keychain value (see
-# additional check below)
-key <- system("echo $KEY", intern = TRUE)
-if(key != "" & key != "$KEY"){
-  wf_set_key(user = "khrdev@outlook.com",
-             key = system("echo $KEY", intern = TRUE),
-             service = "webapi")
-}
-rm(key)
-
-# Check if a password is not set. This traps the inconsistent
-# behavious between systems while accomodating for encrypted
-# keys on Travis CI. Mostly this deals with the sandboxed
-# checks on linux which can't access the global keychain or
-# environmental variables (hence fail to retrieve the api key).
-# This also allows for very basic checks on r-hub.
-# No checks should be skiped on either Travis CI or OSX.
-login_check <- try(wf_get_key(user = "khrdev@outlook.com"), silent = TRUE)
-login_check <- inherits(login_check, "try-error")
+# is the server reachable
 server_check <- !ecmwf_running(wf_server(service = "webapi"))
 
+# if server is up, create login
+if(!server_check){
+  key <- system("echo $KEY", intern = TRUE)
+  if(key != "" & key != "$KEY"){
+    wf_set_key(user = "khrdev@outlook.com",
+               key = system("echo $KEY", intern = TRUE),
+               service = "webapi")
+  }
+  rm(key)
+
+  login_check <- try(wf_get_key(user = "khrdev@outlook.com"), silent = TRUE)
+  login_check <- inherits(login_check, "try-error")
+} else {
+  login_check <- TRUE
+}
+
 test_that("set, get secret key",{
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
 
@@ -56,16 +53,21 @@ test_that("set, get secret key",{
 })
 
 test_that("test dataset function", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   expect_output(str(wf_datasets(user = "khrdev@outlook.com")))
 })
 
 test_that("test dataset function - no login", {
+  skip_on_cran()
+  skip_if(login_check)
+  skip_if(server_check)
   expect_error(wf_datasets())
 })
 
 test_that("list datasets webapi",{
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   expect_output(str(wf_datasets(user = "khrdev@outlook.com",
@@ -73,26 +75,35 @@ test_that("list datasets webapi",{
 })
 
 test_that("test services function", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   expect_output(str(wf_services(user = "khrdev@outlook.com")))
 })
 
 test_that("test services function - no login", {
+  skip_on_cran()
+  skip_if(login_check)
+  skip_if(server_check)
   expect_error(wf_services())
 })
 
 test_that("test user info function", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   expect_output(str(wf_user_info(user = "khrdev@outlook.com")))
 })
 
 test_that("test user info function - no login", {
+  skip_on_cran()
+  skip_if(login_check)
+  skip_if(server_check)
   expect_error(wf_user_info())
 })
 
 test_that("test request (transfer) function", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   expect_message(wf_request(
@@ -103,6 +114,7 @@ test_that("test request (transfer) function", {
 })
 
 test_that("test request (transfer) function", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
 
@@ -118,6 +130,7 @@ test_that("test request (transfer) function", {
 })
 
 test_that("test request (transfer) function - time out", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   expect_output(str(wf_request(
@@ -128,6 +141,7 @@ test_that("test request (transfer) function - time out", {
 })
 
 test_that("test request (transfer) function - no transfer", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   ct <- wf_request(
@@ -150,14 +164,20 @@ test_that("test request (transfer) function - no transfer", {
 })
 
 test_that("test request (transfer) function - no email", {
+  skip_on_cran()
+  skip_if(login_check)
+  skip_if(server_check)
   expect_error(wf_request())
 })
 
 test_that("test transfer function - no login", {
+  skip_if(login_check)
+  skip_if(server_check)
   expect_error(wf_transfer())
 })
 
 test_that("list datasets webapi",{
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   expect_output(str(wf_datasets(user = "khrdev@outlook.com",
@@ -168,6 +188,7 @@ test_that("list datasets webapi",{
 })
 
 test_that("test request (transfer) function", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   expect_message(
@@ -181,6 +202,7 @@ test_that("test request (transfer) function", {
 
 # webapi product info
 test_that("check product info",{
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   expect_output(str(
@@ -191,10 +213,14 @@ test_that("check product info",{
 })
 
 test_that("test delete function - no login", {
+  skip_on_cran()
+  skip_if(login_check)
+  skip_if(server_check)
   expect_error(wf_delete())
 })
 
 test_that("test request (transfer) function - larger download", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
 
@@ -221,6 +247,10 @@ test_that("test request (transfer) function - larger download", {
 })
 
 test_that("check request - no dataset field", {
+  skip_on_cran()
+  skip_if(login_check)
+  skip_if(server_check)
+
   my_request <- list(stream = "oper",
                         levtype = "sfc",
                         param = "167.128",
@@ -240,6 +270,10 @@ test_that("check request - no dataset field", {
 })
 
 test_that("check request - bad request type", {
+  skip_on_cran()
+  skip_if(login_check)
+  skip_if(server_check)
+
   my_request <- "xyz"
   expect_error(
     wf_check_request(
@@ -249,6 +283,10 @@ test_that("check request - bad request type", {
 })
 
 test_that("check mars request - no target", {
+  skip_on_cran()
+  skip_if(login_check)
+  skip_if(server_check)
+
   my_request <- list(stream = "oper",
                         levtype = "sfc",
                         param = "167.128",
@@ -269,6 +307,10 @@ test_that("check mars request - no target", {
 })
 
 test_that("check request - no netcdf grid specified", {
+  skip_on_cran()
+  skip_if(login_check)
+  skip_if(server_check)
+
   my_request <- list(stream = "oper",
                         levtype = "sfc",
                         param = "167.128",
@@ -288,7 +330,10 @@ test_that("check request - no netcdf grid specified", {
 })
 
 test_that("check request - bad credentials", {
+  skip_on_cran()
+  skip_if(login_check)
   skip_if(server_check)
+
   my_request <- list(stream = "oper",
                         levtype = "sfc",
                         param = "167.128",

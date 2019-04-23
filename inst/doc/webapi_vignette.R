@@ -12,31 +12,6 @@ library(raster)
 library(maps)
 library(ecmwfr)
 
-# import the encrypted key if desired
-# (does not exist locally)
-key <- system("echo $KEY", intern = TRUE)
-if(key != "" & key != "$KEY"){
-  wf_set_key(user = "khrdev@outlook.com",
-             key = key,
-             service = "webapi")
-}
-rm(key)
-
-# check cran, same routine as skip_on_cran()
-# but not dependent on testthat which might
-# not be available on user systems (not required
-# only suggested)
-check_cran <- function() {
-  key <- try(wf_get_key("khrdev@outlook.com"))
-  if (!inherits(key, "try-error")){
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
-}
-
-# do cran check
-cran <- check_cran()
 
 ## ----eval = FALSE--------------------------------------------------------
 #  # set a key to the keychain
@@ -57,7 +32,7 @@ cran <- check_cran()
 
 ## ----eval = FALSE, message=FALSE, warning=FALSE--------------------------
 #  # this is an example of a request
-#  my_request <- list(stream  = "oper",
+#  request <- list(stream  = "oper",
 #                     levtype = "sfc",
 #                     param   = "167.128",
 #                     dataset = "interim",
@@ -74,7 +49,7 @@ cran <- check_cran()
 #  # an example download using fw_request()
 #  # using the above request list()
 #  ncfile <- wf_request(user    = "khrdev@outlook.com",
-#             request  = my_request,
+#             request  = request,
 #             transfer = TRUE,
 #             path     = tempdir(),
 #             verbose  = FALSE)
@@ -82,16 +57,16 @@ cran <- check_cran()
 ## ----echo = FALSE--------------------------------------------------------
 ncfile <- system.file(package = "ecmwfr","extdata/webapi.nc")
 
-## ----fig.width = 7, fig.height = 7, eval = cran--------------------------
-#  s <- raster::stack(ncfile)
-#  print(s)
-#  
-#  raster::plot(s[[1]], main = "2 meter temperature (Kelvin)")
-#  maps::map("world", add = TRUE)
+## ----fig.width = 7, fig.height = 7, eval = TRUE--------------------------
+s <- raster::stack(ncfile)
+print(s)
+
+raster::plot(s[[1]], main = "2 meter temperature (Kelvin)")
+maps::map("world", add = TRUE)
 
 ## ----mars example, eval = FALSE------------------------------------------
 #  # this is an example of a request
-#  my_request <- list("dataset" = "mars",
+#  request <- list("dataset" = "mars",
 #                     "class"   = "od",
 #                     "date"    = "2019-01-22",
 #                     "expver"  = "1",
@@ -110,10 +85,10 @@ ncfile <- system.file(package = "ecmwfr","extdata/webapi.nc")
 #  wf_request(user    = "khrdev@outlook.com",
 #             transfer = TRUE,
 #             path     = "~",
-#             request  = my_request,
+#             request  = request,
 #             verbose  = FALSE)
 
-## ----eval = cran---------------------------------------------------------
+## ----eval = FALSE--------------------------------------------------------
 #  # user info
 #  user_info <- wf_user_info(user = "khrdev@outlook.com")
 #  head(user_info)

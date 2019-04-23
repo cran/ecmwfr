@@ -17,31 +17,30 @@ cds_request <- list(
               "format"         = "netcdf",
               "target"         = "era5-demo.nc")
 
-# set password using encrypted key
-# if provided, otherwise just continue
-# assuming a valid keychain value (see
-# additional check below)
-key <- system("echo $CDS", intern = TRUE)
-if(key != "" & key != "$CDS"){
-  wf_set_key(user = "2088",
-             key = key,
-             service = "cds")
-}
-rm(key)
+# is the server reachable
+server_check <- !ecmwf_running(wf_server(service = "webapi"))
 
-# Check if a password is not set. This traps the inconsistent
-# behavious between systems while accomodating for encrypted
-# keys on Travis CI. Mostly this deals with the sandboxed
-# checks on linux which can't access the global keychain or
-# environmental variables (hence fail to retrieve the api key).
-# This also allows for very basic checks on r-hub.
-# No checks should be skiped on either Travis CI or OSX.
-login_check <- try(wf_get_key(user = "2088",
-                              service = "cds"), silent = TRUE)
-login_check <- inherits(login_check, "try-error")
-server_check <- !ecmwf_running(wf_server(service = "cds"))
+# if the server is reachable, try to set login
+# if not set login check to TRUE as well
+if(!server_check){
+  key <- system("echo $CDS", intern = TRUE)
+  if(key != "" & key != "$CDS"){
+    wf_set_key(user = "2088",
+               key = key,
+               service = "cds")
+  }
+  rm(key)
+
+  login_check <- try(wf_get_key(user = "2088",
+                                service = "cds"), silent = TRUE)
+  login_check <- inherits(login_check, "try-error")
+  server_check <- !ecmwf_running(wf_server(service = "cds"))
+} else {
+  login_check <- TRUE
+}
 
 test_that("set key", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   key <- system("echo $CDS", intern = TRUE)
@@ -54,6 +53,7 @@ test_that("set key", {
 })
 
 test_that("cds datasets returns data.frame or list", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   expect_true(inherits(wf_datasets(user = "2088",
@@ -66,6 +66,7 @@ test_that("cds datasets returns data.frame or list", {
 
 # Testing the cds request function
 test_that("cds request", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
 
@@ -88,6 +89,7 @@ test_that("cds request", {
 
 # # Expecting error if required arguments are not set:
  test_that("required arguments missing for cds_* functions", {
+   skip_on_cran()
    skip_if(login_check)
    skip_if(server_check)
 
@@ -132,6 +134,7 @@ test_that("cds request", {
 
 # check delete routine CDS (fails)
 test_that("delete request", {
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
    expect_warning(
@@ -142,6 +145,7 @@ test_that("delete request", {
 
 # CDS product info
 test_that("check product info",{
+  skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
   expect_output(
