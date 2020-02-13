@@ -1,4 +1,4 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -13,7 +13,7 @@ library(maps)
 library(ecmwfr)
 
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  # set a key to the keychain
 #  wf_set_key(user = "khrdev@outlook.com",
 #             key = "XXXXXXXXXXXXXXXXXXXXXX",
@@ -26,11 +26,11 @@ library(ecmwfr)
 #  # in this case represented by the fake X string.
 #  # "XXXXXXXXXXXXXXXXXXXXXX"
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  # set a key to the keychain
 #  wf_set_key(service = "webapi")
 
-## ----eval = FALSE, message=FALSE, warning=FALSE--------------------------
+## ----eval = FALSE, message=FALSE, warning=FALSE-------------------------------
 #  # this is an example of a request
 #  request <- list(stream  = "oper",
 #                     levtype = "sfc",
@@ -54,17 +54,17 @@ library(ecmwfr)
 #             path     = tempdir(),
 #             verbose  = FALSE)
 
-## ----echo = FALSE--------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 ncfile <- system.file(package = "ecmwfr","extdata/webapi.nc")
 
-## ----fig.width = 7, fig.height = 7, eval = TRUE--------------------------
+## ----fig.width = 7, fig.height = 7, eval = TRUE-------------------------------
 s <- raster::stack(ncfile)
 print(s)
 
 raster::plot(s[[1]], main = "2 meter temperature (Kelvin)")
 maps::map("world", add = TRUE)
 
-## ----mars example, eval = FALSE------------------------------------------
+## ----mars example, eval = FALSE-----------------------------------------------
 #  # this is an example of a request
 #  request <- list("dataset" = "mars",
 #                     "class"   = "od",
@@ -88,7 +88,7 @@ maps::map("world", add = TRUE)
 #             request  = request,
 #             verbose  = FALSE)
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  # user info
 #  user_info <- wf_user_info(user = "khrdev@outlook.com")
 #  head(user_info)

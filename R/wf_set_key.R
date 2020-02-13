@@ -8,7 +8,6 @@
 #' @param service service associated with credentials ("webapi" or "cds")
 #'
 #' @return It invisibly returns the user.
-#' @keywords key management
 #' @seealso \code{\link[ecmwfr]{wf_get_key}}
 #' @export
 #' @author Koen Kufkens
@@ -49,7 +48,8 @@ wf_set_key <- function(user, key, service){
     browseURL(wf_key_page(service))
     message("Login or register to get a key")
     user <- readline("User ID / email: ")
-    key <- readline("API key: ")
+    key <- getPass::getPass(msg = "API key: ")
+    if (is.null(key)) stop("No key supplied.")
   }
 
   # check login

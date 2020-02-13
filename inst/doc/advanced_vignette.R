@@ -1,4 +1,4 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -12,11 +12,11 @@ library(raster)
 library(maps)
 library(ecmwfr)
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  # set a key to the keychain interactively
 #  user <- wf_set_key(service = "webapi")
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  list(stream  = "oper",
 #       levtype = "sfc",
 #       param   = "167.128",
@@ -32,7 +32,7 @@ library(ecmwfr)
 #       target  = "tmp.nc") %>%
 #    wf_request(user = user, path = "~")
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  # this is an example of a request
 #  dynamic_request <- wf_archetype(request = list(
 #    stream  = "oper",

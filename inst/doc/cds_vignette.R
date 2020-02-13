@@ -1,4 +1,4 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -9,7 +9,7 @@ library(ncdf4)
 library(raster)
 library(maps)
 
-## ----demo request, echo = TRUE-------------------------------------------
+## ----demo request, echo = TRUE------------------------------------------------
 # Specify the data set
 request <- list("dataset"        = "reanalysis-era5-pressure-levels",
                 "product_type"   = "reanalysis",
@@ -23,7 +23,7 @@ request <- list("dataset"        = "reanalysis-era5-pressure-levels",
                 "format"         = "netcdf",
                 "target"         = "era5-demo.nc")
 
-## ----spatial-request, echo = TRUE, eval = FALSE--------------------------
+## ----spatial-request, echo = TRUE, eval = FALSE-------------------------------
 #  # Start downloading the data, the path of the file
 #  # will be returned as a variable (ncfile)
 #  ncfile <- wf_request(user = "2088",
@@ -32,7 +32,7 @@ request <- list("dataset"        = "reanalysis-era5-pressure-levels",
 #                        path = "~",
 #                        verbose = FALSE)
 
-## ----echo = FALSE--------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 ncfile <- system.file(package = "ecmwfr","extdata/cds.nc")
 
 ## ----spatial-plot, echo = TRUE, figure = TRUE, fig.width = 8, fig.height = 6----
