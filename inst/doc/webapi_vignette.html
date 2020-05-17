@@ -13,7 +13,7 @@
 
 <meta name="author" content="Koen Hufkens" />
 
-<meta name="date" content="2020-02-13" />
+<meta name="date" content="2020-05-17" />
 
 <title>WebAPI</title>
 
@@ -23,7 +23,7 @@
 <style type="text/css" data-origin="pandoc">
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; position: absolute; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -36,13 +36,11 @@ code.sourceCode { white-space: pre-wrap; }
 a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
 pre.numberSource a.sourceLine
-  { position: relative; }
-pre.numberSource a.sourceLine:empty
-  { position: absolute; }
+  { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
   { content: attr(data-line-number);
-    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all;
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -306,7 +304,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">WebAPI</h1>
 <h4 class="author">Koen Hufkens</h4>
-<h4 class="date">2020-02-13</h4>
+<h4 class="date">2020-05-17</h4>
 
 
 
@@ -330,7 +328,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <p>Alternatively, you can call the <code>wf_set_key()</code> function with only the service argument. The function will then redirect you to the correct login page where you can find your login credentials, which can be copied and pasted into the command prompt.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># set a key to the keychain</span></a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">wf_set_key</span>(<span class="dt">service =</span> <span class="st">&quot;webapi&quot;</span>)</a></code></pre></div>
-<p>Before you can download any data you have to make sure to accept the terms and conditions here: <a href="https://apps.ecmwf.int/datasets/licences/general/" class="uri">https://apps.ecmwf.int/datasets/licences/general/</a>.</p>
+<p>Before you can download any data you have to make sure to accept the terms and conditions here: <a href="https://apps.ecmwf.int/datasets/licences/general/">https://apps.ecmwf.int/datasets/licences/general/</a>.</p>
 </div>
 <div id="ecmwf-data-requests-public-data-sets" class="section level2">
 <h2>ECMWF Data Requests (Public Data Sets)</h2>
@@ -379,7 +377,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="ecmwf-mars-requests" class="section level2">
 <h2>ECMWF mars Requests</h2>
 <p>The <code>ecmwfr</code> package (<a href="../references/wf_request.html"><code>wf_request()</code></a>) also allows to submit <em>mars</em> requests. Note that this requires a member state login or a commercial user account!</p>
-<p>The <code>ecmwfr</code> syntax for <em>mars</em> requests is identical to the ones to the public ECMWF API except that one has to specify <code>dataset = &quot;mars&quot;</code>. The example below downloads the 2 meter temperature forecast (parameter <code>167</code>) from the 00 UTC ECMWF HRES run January 22, 2019, only 12 ahead forecast (<code>step</code>). A NetCDF file with a regular <code>0.125 x 0.125</code> degree horizontal resolution for a custom area in northern Europe will be downloaded (<code>area</code>). <strong>Note</strong> that the <code>grid</code> specification <em>is required</em> if <code>format = &quot;netcdf&quot;</code> as grib to netcdf conversion is only able for regular longitude-latitude grids.</p>
+<p>The <code>ecmwfr</code> syntax for <em>mars</em> requests is identical to the ones to the public ECMWF API except that one has to specify <code>dataset = &quot;mars&quot;</code>. The example below downloads the 2 meter temperature forecast (parameter <code>167</code>) from the 00 UTC ECMWF HRES run January 22, 2019, only 12 ahead forecast (<code>step</code>). A NetCDF file with a regular <code>0.125 x 0.125</code> degree horizontal resolution for a custom area in northern Europe will be downloaded (<code>area</code>). <strong>Note</strong> that the <code>grid</code> specification <em>is required</em> if <code>format = &quot;netcdf&quot;</code> as grib to NetCDF conversion is only able for regular longitude-latitude grids.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># this is an example of a request</span></a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">request &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;dataset&quot;</span> =<span class="st"> &quot;mars&quot;</span>,</a>
 <a class="sourceLine" id="cb5-3" data-line-number="3">                   <span class="st">&quot;class&quot;</span>   =<span class="st"> &quot;od&quot;</span>,</a>

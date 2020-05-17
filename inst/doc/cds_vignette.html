@@ -13,7 +13,7 @@
 
 <meta name="author" content="Reto Stauffer, Koen Hufkens" />
 
-<meta name="date" content="2020-02-13" />
+<meta name="date" content="2020-05-17" />
 
 <title>CDS</title>
 
@@ -23,7 +23,7 @@
 <style type="text/css" data-origin="pandoc">
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; position: absolute; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -36,13 +36,11 @@ code.sourceCode { white-space: pre-wrap; }
 a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
 pre.numberSource a.sourceLine
-  { position: relative; }
-pre.numberSource a.sourceLine:empty
-  { position: absolute; }
+  { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
   { content: attr(data-line-number);
-    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all;
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -306,7 +304,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">CDS</h1>
 <h4 class="author">Reto Stauffer, Koen Hufkens</h4>
-<h4 class="date">2020-02-13</h4>
+<h4 class="date">2020-05-17</h4>
 
 
 
@@ -375,7 +373,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </div>
 <div id="date-period-specification" class="section level2">
 <h2>Date period specification</h2>
-<p>For those familiar to ECMWFs <em>mars</em> syntax: CDS does not accept <code>date = &quot;2000-01-01/to/2000-12-31&quot;</code> specifications at the moment. It is possible to specify one specific date via <code>date = &quot;2000-01-01&quot;</code> or multiple days via <code>date = [&quot;2000-01-01&quot;,&quot;2000-01-02&quot;,&quot;2000-10-20&quot;]</code> but not via <code>&quot;.../to/...&quot;</code>.</p>
+<p>For those familiar to ECMWF <em>mars</em> syntax: CDS does not accept <code>date = &quot;2000-01-01/to/2000-12-31&quot;</code> specifications at the moment. It is possible to specify one specific date via <code>date = &quot;2000-01-01&quot;</code> or multiple days via <code>date = [&quot;2000-01-01&quot;,&quot;2000-01-02&quot;,&quot;2000-10-20&quot;]</code> but not via <code>&quot;.../to/...&quot;</code>.</p>
 </div>
 
 
