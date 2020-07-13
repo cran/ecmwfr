@@ -2,7 +2,7 @@
 % Please edit documentation in R/wf_delete.R
 \name{wf_delete}
 \alias{wf_delete}
-\title{ECMWF delete request}
+\title{delete ECMWF request}
 \usage{
 wf_delete(url, user, service = "webapi", verbose = TRUE)
 }
@@ -12,8 +12,8 @@ wf_delete(url, user, service = "webapi", verbose = TRUE)
 \item{user}{user (email address) used to sign up for the ECMWF data service,
 used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}}
 
-\item{service}{character, one of \code{ecmwf} or \code{cds} depending
-on the data set to be deleted.}
+\item{service}{which service to use, one of \code{webapi}, \code{cds}
+or \code{ads} (default = webapi)}
 
 \item{verbose}{show feedback on processing}
 }
@@ -36,5 +36,5 @@ wf_get_key(email = "test@mail.com")
 \code{\link[ecmwfr]{wf_request}}
 }
 \author{
-Koen Kufkens
+Koen Hufkens
 }

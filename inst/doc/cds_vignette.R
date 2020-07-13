@@ -11,7 +11,7 @@ library(maps)
 
 ## ----demo request, echo = TRUE------------------------------------------------
 # Specify the data set
-request <- list("dataset"        = "reanalysis-era5-pressure-levels",
+request <- list("dataset_short_name" = "reanalysis-era5-pressure-levels",
                 "product_type"   = "reanalysis",
                 "variable"       = "temperature",
                 "pressure_level" = "850",

@@ -3,9 +3,16 @@
 #' Saves the token to your local keychain under
 #' a service called "ecmwfr".
 #'
+#' In systems without keychain management set the option
+#' keyring_backend to `file` (i.e. options(keyring_backend = "file"))
+#' in order to write the keychain entry to an encrypted file.
+#' This mostly pertains to headless Linux systems. The keychain files
+#' can be found in ~/.config/r-keyring.
+#'
 #' @param user user (email address) used to sign up for the ECMWF data service
 #' @param key token provided by ECMWF
-#' @param service service associated with credentials ("webapi" or "cds")
+#' @param service which service to use, one of \code{webapi}, \code{cds}
+#' or \code{ads}
 #'
 #' @return It invisibly returns the user.
 #' @seealso \code{\link[ecmwfr]{wf_get_key}}
@@ -27,11 +34,22 @@
 #'}
 #' @importFrom utils browseURL
 wf_set_key <- function(user, key, service) {
+
   if (keyring::default_backend()$name != "env") {
-    if (keyring::keyring_is_locked()) {
-      message("Your keyring is locked please
+    if (keyring::default_backend()$name == "file") {
+      if ("ecmwfr" %in% keyring::keyring_list()$keyring) {
+        if(keyring::keyring_is_locked(keyring = "ecmwfr")){
+          message("Your keyring is locked please
               unlock with your keyring password!")
-      keyring::keyring_unlock()
+          keyring::keyring_unlock(keyring = "ecmwfr")
+        }
+      }
+    } else {
+      if (keyring::keyring_is_locked()) {
+        message("Your keyring is locked please
+              unlock with your keyring password!")
+        keyring::keyring_unlock()
+      }
     }
   }
 
@@ -61,12 +79,35 @@ wf_set_key <- function(user, key, service) {
   if (!login_ok) {
     stop("Could not validate login information.")
   } else {
-    keyring::key_set_with_value(
-      service = make_key_service(service),
-      username = user,
-      password = key
-    )
-    message("User ", user, " for ", service, " service added successfully")
+
+    # if ecmwfr keyring is not created do so
+    if(keyring::default_backend()$name == "file"){
+      if(!("ecmwfr" %in% keyring::keyring_list()$keyring)){
+        keyring::keyring_create("ecmwfr")
+      }
+
+      # set keyring
+      keyring::key_set_with_value(
+        service = make_key_service(service),
+        username = user,
+        password = key,
+        keyring = "ecmwfr"
+      )
+
+      message("User ", user, " for ", service,
+              " service added successfully in keychain file")
+
+    } else {
+      keyring::key_set_with_value(
+        service = make_key_service(service),
+        username = user,
+        password = key
+      )
+
+      message("User ", user, " for ", service,
+              " service added successfully in keychain")
+    }
+
     return(invisible(user))
   }
 

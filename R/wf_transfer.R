@@ -6,7 +6,8 @@
 #' @param user user (email address) used to sign up for the ECMWF data service,
 #' used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}.
 #' @param url url to query
-#' @param service which service to use, one of \code{webapi} or \code{cds}
+#' @param service which service to use, one of \code{webapi}, \code{cds}
+#' or \code{ads} (default = webapi)
 #' @param path path were to store the downloaded data
 #' @param filename filename to use for the downloaded data
 #' @param verbose show feedback on data transfers
@@ -35,8 +36,9 @@ wf_transfer <- function(url,
                         path = tempdir(),
                         filename = tempfile("ecmwfr_"),
                         verbose = TRUE) {
+
   # match arguments, if not stop
-  service <- match.arg(service, c("webapi", "cds"))
+  service <- match.arg(service, c("webapi", "cds", "ads"))
 
   # check the login credentials
   if (missing(user) || missing(url)) {
@@ -44,7 +46,7 @@ wf_transfer <- function(url,
   }
 
   # If the URL is not an URL but an ID: generate URL
-  if (service == "cds") {
+  if (service == "cds" | service == "ads") {
     url <- wf_server(id = url, service = service)
   }
 
@@ -55,7 +57,7 @@ wf_transfer <- function(url,
   tmp_file <- file.path(path, filename)
 
   # download routine depends on service queried
-  if (service == "cds") {
+  if (service == "cds" | service == "ads") {
     response <- httr::GET(
       url,
       httr::authenticate(user, key),
@@ -143,14 +145,15 @@ wf_transfer <- function(url,
                           href = url)))
   }
 
-  if (service == "cds") {
+  if (service == "cds" | service == "ads") {
+
     # if the transfer failed, return error and stop()
     if (ct$state == "failed") {
       message("Data transfer failed!")
       stop(ct$error)
     }
 
-    if (ct$state != "complete" || is.null(ct$state)) {
+    if (ct$state != "completed" || is.null(ct$state)) {
       ct$code <- 202
     }
 

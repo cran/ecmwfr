@@ -19,7 +19,8 @@ wf_transfer(
 \item{user}{user (email address) used to sign up for the ECMWF data service,
 used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}.}
 
-\item{service}{which service to use, one of \code{webapi} or \code{cds}}
+\item{service}{which service to use, one of \code{webapi}, \code{cds}
+or \code{ads} (default = webapi)}
 
 \item{path}{path were to store the downloaded data}
 
@@ -32,7 +33,7 @@ a netCDF of data on disk as specified by a
 \code{\link[ecmwfr]{wf_request}}
 }
 \description{
-Returns the contents of the requested url as a netCDF file downloaded
+Returns the contents of the requested url as a NetCDF file downloaded
 to disk or the current status of the requested transfer.
 }
 \examples{
@@ -53,5 +54,5 @@ wf_transfer(r$href, "test@email.com")
 \code{\link[ecmwfr]{wf_request}}
 }
 \author{
-Koen Kufkens
+Koen Hufkens
 }

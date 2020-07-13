@@ -16,7 +16,7 @@ wf_request(
 }
 \arguments{
 \item{request}{nested list with query parameters following the layout
-as specified on the ECMWF API page}
+as specified on the ECMWF APIs page}
 
 \item{user}{user (email address) used to sign up for the ECMWF data service,
 used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}}
@@ -78,5 +78,5 @@ wf_request(request = request, user = "test@mail.com", job_name = "test")
 \code{\link[ecmwfr]{wf_transfer}}
 }
 \author{
-Koen Kufkens
+Koen Hufkens
 }

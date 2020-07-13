@@ -6,8 +6,8 @@
 #' used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}
 #' @param url url to query
 #' @param verbose show feedback on processing
-#' @param service character, one of \code{ecmwf} or \code{cds} depending
-#' on the data set to be deleted.
+#' @param service which service to use, one of \code{webapi}, \code{cds}
+#' or \code{ads} (default = webapi)
 #' @seealso \code{\link[ecmwfr]{wf_set_key}}
 #' \code{\link[ecmwfr]{wf_transfer}}
 #' \code{\link[ecmwfr]{wf_request}}
@@ -36,20 +36,20 @@ wf_delete <- function(
   }
 
   # match arguments, if not stop
-  service <- match.arg(service, c("webapi", "cds"))
+  service <- match.arg(service, c("webapi", "cds", "ads"))
 
   # get key
   key <- wf_get_key(user = user, service = service)
 
   # If the URL is not an URL but an ID: generate URL
-  if (service == "cds") {
+  if (service == "cds" | service == "ads") {
     url <- wf_server(id = url, service = service)
   }
 
   # remove a queued download
   # Differs for ecmwf and cds requests.
   # For CDS: note that 'user' is simply a copy of 'user'
-  if(service == "cds") {
+  if(service == "cds" | service == "ads") {
     response <- httr::DELETE(
       url,
       httr::authenticate(user, key),

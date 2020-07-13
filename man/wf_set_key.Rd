@@ -11,7 +11,8 @@ wf_set_key(user, key, service)
 
 \item{key}{token provided by ECMWF}
 
-\item{service}{service associated with credentials ("webapi" or "cds")}
+\item{service}{which service to use, one of \code{webapi}, \code{cds}
+or \code{ads}}
 }
 \value{
 It invisibly returns the user.
@@ -19,6 +20,13 @@ It invisibly returns the user.
 \description{
 Saves the token to your local keychain under
 a service called "ecmwfr".
+}
+\details{
+In systems without keychain management set the option
+keyring_backend to `file` (i.e. options(keyring_backend = "file"))
+in order to write the keychain entry to an encrypted file.
+This mostly pertains to headless Linux systems. The keychain files
+can be found in ~/.config/r-keyring.
 }
 \examples{
 
@@ -39,5 +47,5 @@ wf_get_key()
 \code{\link[ecmwfr]{wf_get_key}}
 }
 \author{
-Koen Kufkens
+Koen Hufkens
 }

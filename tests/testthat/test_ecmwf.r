@@ -144,20 +144,21 @@ test_that("test request (transfer) function - no transfer", {
   skip_on_cran()
   skip_if(login_check)
   skip_if(server_check)
+
   ct <- wf_request(
     user = "khrdev@outlook.com",
     transfer = FALSE,
     request = my_request)
+
+  expect_output(str(ct))
+  expect_message(wf_delete(user = "khrdev@outlook.com",
+                           url = ct$href))
 
   ct2 <- wf_request(
     user = "khrdev@outlook.com",
     transfer = FALSE,
     request = my_request)
 
-
-  expect_output(str(ct))
-  expect_message(wf_delete(user = "khrdev@outlook.com",
-                           url = ct$href))
   expect_silent(wf_delete(user = "khrdev@outlook.com",
                           url = ct2$href,
                           verbose = FALSE))

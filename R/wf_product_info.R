@@ -3,11 +3,12 @@
 #' Shows and returns detailed product information about a specific data set
 #' (see \code{\link[ecmwfr]{wf_datasets}}).
 #'
-#' @param user string, user ID used to sign up for the CDS data service,
+#' @param user string, user ID used to sign up for the CDS / ADS data service,
 #' used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}.
 #' @param dataset character, name of the data set for which the product
 #' information should be loaded.
-#' @param service which service to use, one of \code{webapi} or \code{cds}
+#' @param service which service to use, one of \code{webapi}, \code{cds}
+#' or \code{ads} (default = webapi)
 #' @param simplify boolean, default \code{TRUE}. If \code{TRUE} the description
 #' will be returned as tidy data instead of a nested list.
 #'
@@ -37,11 +38,11 @@ wf_product_info <- function(
 
   # check the login credentials
   if(missing(user) || missing(dataset)){
-    stop("Please provide CDS user ID (or set user = NULL, see manual)")
+    stop("Please provide a user ID")
   }
 
   # match arguments, if not stop
-  service <- match.arg(service, c("webapi", "cds"))
+  service <- match.arg(service, c("webapi", "cds", "ads"))
 
   # query the status url provided
   if (service == "webapi"){
@@ -65,7 +66,7 @@ wf_product_info <- function(
 
   } else {
     response <- httr::GET(sprintf("%s/resources/%s",
-                                  wf_server(service = "cds"),
+                                  wf_server(service = service),
                                   dataset))
   }
 
