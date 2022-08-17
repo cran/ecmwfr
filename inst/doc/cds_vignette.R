@@ -7,30 +7,35 @@ knitr::opts_chunk$set(
 # load the library
 library(ncdf4)
 library(raster)
+library(terra)
 library(maps)
 
 ## ----demo request, echo = TRUE------------------------------------------------
 # Specify the data set
-request <- list("dataset_short_name" = "reanalysis-era5-pressure-levels",
-                "product_type"   = "reanalysis",
-                "variable"       = "temperature",
-                "pressure_level" = "850",
-                "year"           = "2000",
-                "month"          = "04",
-                "day"            = "04",
-                "time"           = "00:00",
-                "area"           = "70/-20/30/60",
-                "format"         = "netcdf",
-                "target"         = "era5-demo.nc")
+request <- list(
+  "dataset_short_name" = "reanalysis-era5-pressure-levels",
+  "product_type"   = "reanalysis",
+  "variable"       = "temperature",
+  "pressure_level" = "850",
+  "year"           = "2000",
+  "month"          = "04",
+  "day"            = "04",
+  "time"           = "00:00",
+  "area"           = "70/-20/30/60",
+  "format"         = "netcdf",
+  "target"         = "era5-demo.nc"
+  )
 
 ## ----spatial-request, echo = TRUE, eval = FALSE-------------------------------
 #  # Start downloading the data, the path of the file
 #  # will be returned as a variable (ncfile)
-#  ncfile <- wf_request(user = "2088",
-#                        request = request,
-#                        transfer = TRUE,
-#                        path = "~",
-#                        verbose = FALSE)
+#  ncfile <- wf_request(
+#    user = "2088",
+#    request = request,
+#    transfer = TRUE,
+#    path = "~",
+#    verbose = FALSE
+#    )
 
 ## ----echo = FALSE-------------------------------------------------------------
 ncfile <- system.file(package = "ecmwfr","extdata/cds.nc")

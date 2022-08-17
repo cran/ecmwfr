@@ -186,7 +186,8 @@ wf_check_login <- function(user, key, service) {
       encode = "json"
     )
     return(!httr::http_error(info) &&
-             (httr::content(info)$uid == user))
+           (any(user %in% unclass(httr::content(info)[c("uid", "email")]))))
+
   }
 
   # CDS service
@@ -246,4 +247,15 @@ retrieve_header <- function(url, headers) {
 
   head$headers <- curl::parse_headers_list(head$headers)
   return(head)
+}
+
+
+
+# Encapsulates errors are warnings logic.
+warn_or_error <- function(..., error = FALSE) {
+  if (error) {
+    stop(...)
+  } else {
+    warning(...)
+  }
 }

@@ -32,24 +32,24 @@ cds_request_faulty <- list(
   "target"         = "era5-demo.nc")
 
 # is the server reachable
-server_check <- !ecmwf_running(wf_server(service = "cds"))
+server_check <- !ecmwfr:::ecmwf_running(ecmwfr:::wf_server(service = "cds"))
 
 # if the server is reachable, try to set login
 # if not set login check to TRUE as well
 if(!server_check){
-  skip_on_cran()
   key <- system("echo $CDS", intern = TRUE)
   if(key != "" & key != "$CDS"){
-    wf_set_key(user = "2088",
-               key = key,
-               service = "cds")
+    try(
+      wf_set_key(user = "2088",
+                 key = key,
+                 service = "cds")
+    )
   }
   rm(key)
-
   login_check <- try(wf_get_key(user = "2088",
-                                service = "cds"), silent = TRUE)
+                                service = "cds"),
+                     silent = TRUE)
   login_check <- inherits(login_check, "try-error")
-  server_check <- !ecmwf_running(wf_server(service = "cds"))
 } else {
   login_check <- TRUE
 }
@@ -57,12 +57,11 @@ if(!server_check){
 test_that("set key", {
   skip_on_cran()
   skip_if(login_check)
-  skip_if(server_check)
   key <- system("echo $CDS", intern = TRUE)
   if(key != "" & key != "$CDS"){
     expect_message(wf_set_key(user = "2088",
-               key = key,
-               service = "cds"))
+                              key = key,
+                              service = "cds"))
   }
   rm(key)
 })
@@ -70,7 +69,6 @@ test_that("set key", {
 test_that("cds datasets returns data.frame or list", {
   skip_on_cran()
   skip_if(login_check)
-  skip_if(server_check)
   expect_true(inherits(wf_datasets(user = "2088",
                                    service = "cds",
                                    simplify = TRUE), "data.frame"))
@@ -83,12 +81,13 @@ test_that("cds datasets returns data.frame or list", {
 test_that("cds request", {
   skip_on_cran()
   skip_if(login_check)
-  skip_if(server_check)
 
   # ok transfer
-  expect_message(wf_request(user = "2088",
-                    request = cds_request,
-                    transfer = TRUE))
+  expect_message(
+    wf_request(user = "2088",
+               request = cds_request,
+               transfer = TRUE)
+    )
 
   # timeout trigger
   expect_message(
@@ -107,12 +106,13 @@ test_that("cds request", {
   # faulty request
   expect_error(wf_request(
     user = "2088",
-    request = cds_request_faulty))
+    request = cds_request_faulty)
+    )
 
   # wrong request
   expect_error(wf_request(user = "2088",
-                    request = "xyz",
-                    transfer = TRUE))
+                          request = "xyz",
+                          transfer = TRUE))
 
   # missing request
   expect_error(wf_request(user = "2088",
@@ -120,77 +120,131 @@ test_that("cds request", {
 
   # missing user
   expect_message(wf_request(request = cds_request,
-                          transfer = TRUE))
+                            transfer = TRUE))
 
-  expect_true(inherits(wf_request(user = "2088",
-              request = cds_request,
-              transfer = FALSE), "list"))
+  # is R6 class
+  expect_true(inherits(
+    wf_request(
+      user = "2088",
+      request = cds_request,
+      transfer = FALSE)
+    , "R6")
+  )
 })
 
 
 # # Expecting error if required arguments are not set:
- test_that("required arguments missing for cds_* functions", {
-   skip_on_cran()
-   skip_if(login_check)
-   skip_if(server_check)
+test_that("required arguments missing for cds_* functions", {
+  skip_on_cran()
+  skip_if(login_check)
 
-   # CDS dataset (requires at least 'user')
-   expect_error(wf_dataset())
-   expect_output(str(wf_datasets(user = "2088", service = "cds")))
+  # submit request
+  r <- wf_request(
+    user = "2088",
+    request = cds_request,
+    transfer = FALSE
+  )
 
-   # CDS productinfo (requires at least 'user' and 'dataset')
-   expect_error(wf_product_info())
-   expect_error(wf_product_info(user = "2088",
-                                service = "cds",
-                                dataset = "foo"))
+  # CDS dataset (requires at least 'user')
+  expect_error(wf_dataset())
+  expect_output(str(wf_datasets(user = "2088", service = "cds")))
 
-   # CDS productinfo: product name which is not available
-   expect_output(str(wf_product_info(user = "2088",
-                                     service = "cds",
-                                     dataset = "satellite-methane")))
+  # CDS productinfo (requires at least 'user' and 'dataset')
+  expect_error(wf_product_info())
+  expect_error(wf_product_info(user = "2088",
+                               service = "cds",
+                               dataset = "foo"))
 
-   # CDS tranfer (forwarded to wf_transfer, requires at least
-   # 'user' and 'url)
-   expect_error(wf_transfer())
-   expect_error(wf_transfer(user = "2088",
-                            service = "cds",
-                            url = "http://google.com"))
+  # CDS productinfo: product name which is not available
+  expect_output(str(wf_product_info(user = "2088",
+                                    service = "cds",
+                                    dataset = "satellite-methane")))
 
-   # CDS transfer with wrong type
-   expect_error(wf_transfer(user = "2088",
-                            url = "http://google.com",
-                            service = "foo"))
+  # check transfer routine
+  expect_output(
+    wf_transfer(
+      user = "2088",
+      service = "cds",
+      url = r
+      )
+    )
 
-   # check product listing
-   expect_output(str(wf_product_info("reanalysis-era5-single-levels",
-                                     service = "cds",
-                                     user = NULL,
-                                     simplify = FALSE)))
+  # check transfer routine
+  expect_output(
+    wf_transfer(
+      user = "2088",
+      service = "cds",
+      url = basename(r$get_url())
+    )
+  )
 
-   expect_output(str(wf_product_info("reanalysis-era5-single-levels",
-                                     service = "cds",
-                                     user = NULL,
-                                     simplify = FALSE)))
+  # CDS tranfer (forwarded to wf_transfer, requires at least
+  # 'user' and 'url)
+  expect_error(wf_transfer())
+  expect_error(wf_transfer(user = "2088",
+                           service = "cds",
+                           url = "http://google.com"))
+
+  # CDS transfer with wrong type
+  expect_error(wf_transfer(user = "2088",
+                           url = "http://google.com",
+                           service = "foo"))
+
+  # check product listing
+  expect_output(str(wf_product_info("reanalysis-era5-single-levels",
+                                    service = "cds",
+                                    user = NULL,
+                                    simplify = FALSE)))
+
+  expect_output(str(wf_product_info("reanalysis-era5-single-levels",
+                                    service = "cds",
+                                    user = NULL,
+                                    simplify = FALSE)))
 })
 
 # check delete routine CDS (fails)
 test_that("delete request", {
   skip_on_cran()
   skip_if(login_check)
-  skip_if(server_check)
-   expect_warning(
-     wf_delete(user = "2088",
-               service = "cds",
-               url = "50340909as"))
+  expect_warning(
+    wf_delete(user = "2088",
+              service = "cds",
+              url = "50340909as"))
 })
 
 # CDS product info
 test_that("check product info",{
   skip_on_cran()
   skip_if(login_check)
-  skip_if(server_check)
   expect_output(
     str(wf_product_info("reanalysis-era5-single-levels",
                         service = "cds",
                         user = NULL)))
+})
+
+test_that("batch request tests", {
+  skip_on_cran()
+  skip_if(login_check)
+
+  years <- rep(2017,2)
+  requests <- lapply(years, function(y) {
+    list(
+      "dataset_short_name" = "reanalysis-era5-pressure-levels",
+      "product_type"   = "reanalysis",
+      "format"         = "netcdf",
+      "variable"       = "temperature",
+      "pressure_level" = "850",
+      "year"           = y,
+      "month"          = "05",
+      "day"            = "04",
+      "time"           = "00:00",
+      "area"           = "50/9/51/10",
+      "format"         = "netcdf",
+      "target"         = "era5-demo.nc")
+  })
+
+  expect_output(wf_request_batch(
+    requests,
+    user = "2088")
+    )
 })

@@ -7,6 +7,7 @@ knitr::opts_chunk$set(
 # load the library
 library(ncdf4)
 library(raster)
+library(terra)
 library(maps)
 
 ## ----demo request, echo = TRUE------------------------------------------------
@@ -23,10 +24,12 @@ request <- list(
 ## ----spatial-request, echo = TRUE, eval = FALSE-------------------------------
 #  # Start downloading the data, the path of the file
 #  # will be returned as a variable (ncfile)
-#  file <- wf_request(user     = "2345",   # user ID (for authentification)
-#                     request  = request,  # the request
-#                     transfer = TRUE,     # download the file
-#                     path     = ".")      # store data in current working directory
+#  file <- wf_request(
+#    user     = "2345",   # user ID (for authentification)
+#    request  = request,  # the request
+#    transfer = TRUE,     # download the file
+#    path     = "."       # store data in current working directory
+#    )
 
 ## ----echo = FALSE-------------------------------------------------------------
 ncfile <- system.file(package = "ecmwfr","extdata/ads.nc")

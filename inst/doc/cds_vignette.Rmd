@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 # load the library
 library(ncdf4)
 library(raster)
+library(terra)
 library(maps)
 ```
 
@@ -51,17 +52,19 @@ The conversion from a python based string to the list format can be automated if
 
 ```{r demo request, echo = TRUE}
 # Specify the data set
-request <- list("dataset_short_name" = "reanalysis-era5-pressure-levels",
-                "product_type"   = "reanalysis",
-                "variable"       = "temperature",
-                "pressure_level" = "850",
-                "year"           = "2000",
-                "month"          = "04",
-                "day"            = "04",
-                "time"           = "00:00",
-                "area"           = "70/-20/30/60",
-                "format"         = "netcdf",
-                "target"         = "era5-demo.nc")
+request <- list(
+  "dataset_short_name" = "reanalysis-era5-pressure-levels",
+  "product_type"   = "reanalysis",
+  "variable"       = "temperature",
+  "pressure_level" = "850",
+  "year"           = "2000",
+  "month"          = "04",
+  "day"            = "04",
+  "time"           = "00:00",
+  "area"           = "70/-20/30/60",
+  "format"         = "netcdf",
+  "target"         = "era5-demo.nc"
+  )
 ```
 
 This is the "demo" request and it specifies the following:
@@ -81,11 +84,13 @@ The data set as specified above can be downloaded calling the
 ```{r spatial-request, echo = TRUE, eval = FALSE}
 # Start downloading the data, the path of the file
 # will be returned as a variable (ncfile)
-ncfile <- wf_request(user = "2088",
-                      request = request,   
-                      transfer = TRUE,  
-                      path = "~",
-                      verbose = FALSE)
+ncfile <- wf_request(
+  user = "2088",
+  request = request,   
+  transfer = TRUE,  
+  path = "~",
+  verbose = FALSE
+  )
 ```
 
 Depending on the request (the amount of data you are asking for) the request function may tike a while! Please note: if you try to download larger amounts of data it is suggested to split the data sets, e.g., download year-by-year, or even month-by-month, if you are trying to download several varaiables/fields.
@@ -103,9 +108,3 @@ r <- raster::raster(ncfile)
 raster::plot(r, main = "ERA-5 Reanalysis Demo (2m Temperature 850 hPa)")
 maps::map("world", add = TRUE)
 ```
-
-## Date period specification
-
-For those familiar to ECMWF _mars_ syntax: CDS does not
-accept `date = "2000-01-01/to/2000-12-31"` specifications at the moment. It is possible to specify one specific date via `date = "2000-01-01"` or multiple days via `date = ["2000-01-01","2000-01-02","2000-10-20"]` but
-not via `".../to/..."`.

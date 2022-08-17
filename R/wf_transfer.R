@@ -5,7 +5,7 @@
 #'
 #' @param user user (email address) used to sign up for the ECMWF data service,
 #' used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}.
-#' @param url url to query
+#' @param url R6 \code{\link[ecmwfr]{wf_request}}) query output
 #' @param service which service to use, one of \code{webapi}, \code{cds}
 #' or \code{ads} (default = webapi)
 #' @param path path were to store the downloaded data
@@ -27,15 +27,20 @@
 #' r <- wf_request(request, "test@email.com", transfer = FALSE)
 #'
 #' # check transfer, will download if available
-#' wf_transfer(r$href, "test@email.com")
+#' wf_transfer(r$get_url(), "test@email.com")
 #'}
 
 wf_transfer <- function(url,
                         user,
                         service = "webapi",
                         path = tempdir(),
-                        filename = tempfile("ecmwfr_"),
+                        filename = tempfile("ecmwfr_", tmpdir = ""),
                         verbose = TRUE) {
+
+  if (inherits(url, "ecmwfr_service")) {
+    url$transfer()
+    return(url)
+  }
 
   # match arguments, if not stop
   service <- match.arg(service, c("webapi", "cds", "ads"))
