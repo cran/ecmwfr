@@ -8,11 +8,13 @@ opts <- options(keyring_warn_for_env_fallback = FALSE)
 
 # load the library
 library(ncdf4)
-library(raster)
 library(terra)
 library(maps)
 library(ecmwfr)
 
+# grab demo nc files
+ncfile <- list.files(system.file(package="ecmwfr"),"*.nc", recursive = TRUE, full.names = TRUE)
+ncfile <- ncfile[grepl("webapi.nc", ncfile)]
 
 ## ----eval = FALSE-------------------------------------------------------------
 #  # set a key to the keychain
@@ -55,15 +57,15 @@ library(ecmwfr)
 #             path     = tempdir(),
 #             verbose  = FALSE)
 
-## ----echo = FALSE-------------------------------------------------------------
-ncfile <- system.file(package = "ecmwfr","extdata/webapi.nc")
+## ----fig.width = 7, fig.height = 7--------------------------------------------
+# Open NetCDF file and plot the data
+# (trap read error on mac - if gdal netcdf support is missing)
+r <- try(terra::rast(ncfile))
 
-## ----fig.width = 7, fig.height = 7, eval = TRUE-------------------------------
-s <- raster::stack(ncfile)
-print(s)
-
-raster::plot(s[[1]], main = "2 meter temperature (Kelvin)")
-maps::map("world", add = TRUE)
+if(!inherits(r, "try-error")) {
+  terra::plot(r[[1]], main = "2 meter temperature (Kelvin)")
+  maps::map("world", add = TRUE)
+}
 
 ## ----mars example, eval = FALSE-----------------------------------------------
 #  # this is an example of a request

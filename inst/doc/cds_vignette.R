@@ -6,9 +6,12 @@ knitr::opts_chunk$set(
 
 # load the library
 library(ncdf4)
-library(raster)
 library(terra)
 library(maps)
+
+# grab demo nc files
+ncfile <- list.files(system.file(package="ecmwfr"),"*.nc", recursive = TRUE, full.names = TRUE)
+ncfile <- ncfile[grepl("cds.nc", ncfile)]
 
 ## ----demo request, echo = TRUE------------------------------------------------
 # Specify the data set
@@ -37,12 +40,13 @@ request <- list(
 #    verbose = FALSE
 #    )
 
-## ----echo = FALSE-------------------------------------------------------------
-ncfile <- system.file(package = "ecmwfr","extdata/cds.nc")
-
 ## ----spatial-plot, echo = TRUE, figure = TRUE, fig.width = 8, fig.height = 6----
-# Open NetCDF file and plot
-r <- raster::raster(ncfile)
-raster::plot(r, main = "ERA-5 Reanalysis Demo (2m Temperature 850 hPa)")
-maps::map("world", add = TRUE)
+# Open NetCDF file and plot the data
+# (trap read error on mac - if gdal netcdf support is missing)
+r <- try(terra::rast(ncfile))
+
+if(!inherits(r, "try-error")) {
+  terra::plot(r, main = "ERA-5 Reanalysis Demo (2m Temperature 850 hPa)")
+  maps::map("world", add = TRUE)
+}
 

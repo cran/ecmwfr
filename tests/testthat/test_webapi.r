@@ -1,6 +1,13 @@
 # set options
-opts <- options(keyring_warn_for_env_fallback = FALSE)
-on.exit(options(opts), add = TRUE)
+options(keyring_backend="file")
+
+# spoof keyring
+if(!("ecmwfr" %in% keyring::keyring_list()$keyring)){
+  keyring::keyring_create("ecmwfr", password = "test")
+}
+
+# ignore SSL (server has SSL issues)
+httr::set_config(httr::config(ssl_verifypeer = 0L))
 
 # format request (see below)
 my_request <- list(
@@ -20,28 +27,21 @@ my_request <- list(
 )
 
 # is the server reachable
-server_check <- !ecmwfr:::ecmwf_running(ecmwfr:::wf_server(service = "webapi"))
+server_check <- ecmwfr:::ecmwf_running(ecmwfr:::wf_server(service = "webapi"))
 
 # if server is up, create login
-if(!server_check){
-  key <- system("echo $WEBAPI", intern = TRUE)
-  if(key != "" & key != "$WEBAPI"){
-    try(wf_set_key(
+if(server_check){
+  user <- try(
+    wf_set_key(
       user = "info@bluegreenlabs.org",
-      key = key,
+      key = system("echo $WEBAPI", intern = TRUE),
       service = "webapi"
     ))
-  }
-  rm(key)
-
-  login_check <- try(
-    wf_get_key(
-      user = "info@bluegreenlabs.org"),
-    silent = TRUE)
-  login_check <- inherits(login_check, "try-error")
-} else {
-  login_check <- TRUE
+  print(user)
+  login_check <- inherits(user, "try-error")
 }
+
+#----- formal checks ----
 
 test_that("set, get secret key",{
   skip_on_cran()
@@ -364,7 +364,7 @@ test_that("batch request", {
   skip_on_cran()
   skip_if(login_check)
 
-  years <- rep(2017,2)
+  years <- c(2017,2018)
   requests <- lapply(years, function(y) {
     my_request <- list(
       stream = "oper",
@@ -379,7 +379,8 @@ test_that("batch request", {
       class = "ei",
       area = "51/0/50/1",
       format = "netcdf",
-      target = "tmp.nc")
+      target = sprintf("download%s.nc",y)
+      )
   })
 
   expect_output(
@@ -412,16 +413,19 @@ test_that("wf_transfer() check", {
 
   r <- wf_request(
       request,
-      user = "info@bluegreenlabs.org"
+      user = "info@bluegreenlabs.org",
+      transfer = FALSE
     )
 
+  tr <- wf_transfer(
+    user = "info@bluegreenlabs.org",
+    service = "webapi",
+    url = r$get_url()
+  )
+
   # check transfer routine
-  expect_output(
-    wf_transfer(
-      user = "info@bluegreenlabs.org",
-      service = "webapi",
-      url = basename(r$get_url())
-    )
+  expect_equal(
+    tr$code, 302
   )
 
 })

@@ -11,6 +11,7 @@ service <- R6::R6Class("ecmwfr_service", cloneable = FALSE,
       private$file <- file.path(path, request$target)
       private$verbose <- verbose
       private$url <- url
+      self$request_id <- basename(url) # Compatibility with old code
       private$status <- "unsubmitted"
       private$next_retry <- Sys.time()
 
@@ -37,7 +38,9 @@ service <- R6::R6Class("ecmwfr_service", cloneable = FALSE,
       stop("not implemented")
       },
 
-    download = function(force_redownload = FALSE, fail_is_error = TRUE, verbose = NULL) {
+    download = function(force_redownload = FALSE,
+                        fail_is_error = TRUE,
+                        verbose = NULL) {
      stop("not implemented")
     },
 
@@ -68,6 +71,10 @@ service <- R6::R6Class("ecmwfr_service", cloneable = FALSE,
       }
       return(self)
 
+    },
+
+    delete = function() {
+      stop("not implemented")
     },
 
     browse_request = function() {
@@ -110,7 +117,9 @@ service <- R6::R6Class("ecmwfr_service", cloneable = FALSE,
     is_pending = function() {
       # Always pending, unless it has failed or successfully downloaded.
       !(self$is_failed() | private$downloaded)
-    }
+    },
+
+    request_id = NA  # For compatibility with old code
 
   ),
   private = list(

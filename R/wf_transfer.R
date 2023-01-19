@@ -30,12 +30,14 @@
 #' wf_transfer(r$get_url(), "test@email.com")
 #'}
 
-wf_transfer <- function(url,
-                        user,
-                        service = "webapi",
-                        path = tempdir(),
-                        filename = tempfile("ecmwfr_", tmpdir = ""),
-                        verbose = TRUE) {
+wf_transfer <- function(
+    url,
+    user,
+    service = "webapi",
+    path = tempdir(),
+    filename = tempfile("ecmwfr_", tmpdir = ""),
+    verbose = TRUE
+    ) {
 
   if (inherits(url, "ecmwfr_service")) {
     url$transfer()
@@ -52,7 +54,7 @@ wf_transfer <- function(url,
 
   # If the URL is not an URL but an ID: generate URL
   if (service == "cds" | service == "ads") {
-    url <- wf_server(id = url, service = service)
+    url <- wf_server(id = basename(url), service = service)
   }
 
   # get key

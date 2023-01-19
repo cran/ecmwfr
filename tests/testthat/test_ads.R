@@ -1,6 +1,14 @@
 # set options
-opts <- options(keyring_warn_for_env_fallback = FALSE)
-on.exit(options(opts), add = TRUE)
+options(keyring_backend="file")
+
+# spoof keyring
+if(!("ecmwfr" %in% keyring::keyring_list()$keyring)){
+  keyring::keyring_create("ecmwfr", password = "test")
+}
+
+#opts <- options(keyring_warn_for_env_fallback = FALSE)
+#on.exit(options(opts), add = TRUE)
+login_check <- NA
 
 ads_request <- list(
   date = "2003-01-01/2003-01-01",
@@ -15,27 +23,22 @@ ads_request <- list(
 httr::set_config(httr::config(ssl_verifypeer = 0L))
 
 # is the server reachable
-server_check <- !ecmwfr:::ecmwf_running(ecmwfr:::wf_server(service = "ads"))
+server_check <- ecmwfr:::ecmwf_running(ecmwfr:::wf_server(service = "ads"))
 
 # if the server is reachable, try to set login
 # if not set login check to TRUE as well
-if(!server_check){
-  key <- system("echo $ADS", intern = TRUE)
-  if(key != "" & key != "$ADS"){
+if(server_check){
+  user <-
     try(
       wf_set_key(user = "2161",
-                 key = key,
+                 key = system("echo $ADS", intern = TRUE),
                  service = "ads")
     )
-  }
-  rm(key)
-
-  login_check <- try(wf_get_key(user = "2161",
-                                service = "ads"), silent = TRUE)
-  login_check <- inherits(login_check, "try-error")
-} else {
-  login_check <- TRUE
+  print(user)
+  login_check <- inherits(user, "try-error")
 }
+
+#----- formal checks ----
 
 test_that("ads datasets returns data.frame or list", {
   skip_on_cran()
@@ -72,7 +75,9 @@ test_that("check ADS product info",{
 test_that("batch request works", {
   skip_on_cran()
   skip_if(login_check)
-  years <- rep(2017,2)
+
+  years <- c(2017,2018)
+
   requests <- lapply(years, function(y) {
     list(
       date = paste0(y, "-01-01"),
@@ -80,7 +85,7 @@ test_that("batch request works", {
       variable = "dust_aerosol_optical_depth_550nm",
       time = "00:00",
       dataset_short_name = "cams-global-reanalysis-eac4",
-      target = "download.nc"
+      target = sprintf("download%s.nc",y)
     )
   })
 

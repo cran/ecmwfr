@@ -1,6 +1,15 @@
 # set options
-opts <- options(keyring_warn_for_env_fallback = FALSE)
-on.exit(options(opts), add = TRUE)
+options(keyring_backend="file")
+
+# spoof keyring
+if(!("ecmwfr" %in% keyring::keyring_list()$keyring)){
+  keyring::keyring_create("ecmwfr", password = "test")
+}
+
+login_check <- NA
+
+# ignore SSL (server has SSL issues)
+httr::set_config(httr::config(ssl_verifypeer = 0L))
 
 # format request (see below)
 cds_request <- list(
@@ -15,7 +24,8 @@ cds_request <- list(
   "time"           = "00:00",
   "area"           = "50/9/51/10",
   "format"         = "netcdf",
-  "target"         = "era5-demo.nc")
+  "target"         = "era5-demo.nc"
+  )
 
 cds_request_faulty <- list(
   "dataset_short_name" = "reanalysis-era5-preure-levels",
@@ -29,41 +39,33 @@ cds_request_faulty <- list(
   "time"           = "00:00",
   "area"           = "50/9/51/10",
   "format"         = "netcdf",
-  "target"         = "era5-demo.nc")
+  "target"         = "era5-demo.nc"
+  )
 
 # is the server reachable
-server_check <- !ecmwfr:::ecmwf_running(ecmwfr:::wf_server(service = "cds"))
+server_check <- ecmwfr:::ecmwf_running(ecmwfr:::wf_server(service = "cds"))
 
 # if the server is reachable, try to set login
 # if not set login check to TRUE as well
-if(!server_check){
-  key <- system("echo $CDS", intern = TRUE)
-  if(key != "" & key != "$CDS"){
-    try(
-      wf_set_key(user = "2088",
-                 key = key,
-                 service = "cds")
-    )
-  }
-  rm(key)
-  login_check <- try(wf_get_key(user = "2088",
-                                service = "cds"),
-                     silent = TRUE)
-  login_check <- inherits(login_check, "try-error")
-} else {
-  login_check <- TRUE
+if(server_check){
+  user <- try(
+      ecmwfr::wf_set_key(
+        user = "2088",
+        key = Sys.getenv("CDS"),
+        service = "cds")
+      )
+  print(user)
+  login_check <- inherits(user, "try-error")
 }
+
+#----- formal checks ----
 
 test_that("set key", {
   skip_on_cran()
   skip_if(login_check)
-  key <- system("echo $CDS", intern = TRUE)
-  if(key != "" & key != "$CDS"){
     expect_message(wf_set_key(user = "2088",
-                              key = key,
+                              Sys.getenv("CDS"),
                               service = "cds"))
-  }
-  rm(key)
 })
 
 test_that("cds datasets returns data.frame or list", {
@@ -84,52 +86,74 @@ test_that("cds request", {
 
   # ok transfer
   expect_message(
-    wf_request(user = "2088",
-               request = cds_request,
-               transfer = TRUE)
+    wf_request(
+      user = "2088",
+      request = cds_request,
+      transfer = TRUE
+      )
     )
 
   # timeout trigger
   expect_message(
-    wf_request(user = "2088",
-               request = cds_request,
-               time_out = -1,
-               transfer = TRUE))
-
-  # job test (can't run headless)
-  expect_error(
-    wf_request(user = "2088",
-               request = cds_request,
-               transfer = TRUE,
-               job_name = "jobtest"))
-
-  # faulty request
-  expect_error(wf_request(
-    user = "2088",
-    request = cds_request_faulty)
-    )
-
-  # wrong request
-  expect_error(wf_request(user = "2088",
-                          request = "xyz",
-                          transfer = TRUE))
-
-  # missing request
-  expect_error(wf_request(user = "2088",
-                          transfer = TRUE))
-
-  # missing user
-  expect_message(wf_request(request = cds_request,
-                            transfer = TRUE))
-
-  # is R6 class
-  expect_true(inherits(
     wf_request(
       user = "2088",
       request = cds_request,
-      transfer = FALSE)
-    , "R6")
+      time_out = -1,
+      transfer = TRUE
+      )
+    )
+
+  # job test (can't run headless)
+  expect_error(
+    wf_request(
+      user = "2088",
+      request = cds_request,
+      transfer = TRUE,
+      job_name = "jobtest"
+      )
+    )
+
+  # faulty request
+  expect_error(
+    wf_request(
+      user = "2088",
+      request = cds_request_faulty
+    )
   )
+
+  # wrong request
+  expect_error(
+    wf_request(
+      user = "2088",
+      request = "xyz",
+      transfer = TRUE
+      )
+    )
+
+  # missing request
+  expect_error(wf_request(
+    user = "2088",
+    transfer = TRUE
+    )
+  )
+
+  # missing user
+  expect_error(wf_request(
+    request = cds_request,
+    transfer = TRUE
+    )
+  )
+
+  r <- wf_request(
+    user = "2088",
+    request = cds_request,
+    transfer = FALSE
+    )
+
+  # is R6 class
+  expect_true(inherits(r, "R6"))
+  r$delete() # cleanup
+
 })
 
 
@@ -151,31 +175,35 @@ test_that("required arguments missing for cds_* functions", {
 
   # CDS productinfo (requires at least 'user' and 'dataset')
   expect_error(wf_product_info())
-  expect_error(wf_product_info(user = "2088",
-                               service = "cds",
-                               dataset = "foo"))
+  expect_error(wf_product_info(
+    user = "2088",
+    service = "cds",
+    dataset = "foo"
+    )
+  )
 
   # CDS productinfo: product name which is not available
-  expect_output(str(wf_product_info(user = "2088",
-                                    service = "cds",
-                                    dataset = "satellite-methane")))
+  expect_output(str(wf_product_info(
+    user = "2088",
+    service = "cds",
+    dataset = "satellite-methane"
+      )
+    )
+  )
 
   # check transfer routine
   expect_output(
     wf_transfer(
       user = "2088",
       service = "cds",
-      url = r
+      url = r$get_url()
       )
     )
 
-  # check transfer routine
-  expect_output(
-    wf_transfer(
-      user = "2088",
-      service = "cds",
-      url = basename(r$get_url())
-    )
+  # Delete file, check status
+  r$delete()
+  expect_equal(
+    r$get_status(), "deleted"
   )
 
   # CDS tranfer (forwarded to wf_transfer, requires at least
@@ -226,7 +254,7 @@ test_that("batch request tests", {
   skip_on_cran()
   skip_if(login_check)
 
-  years <- rep(2017,2)
+  years <- c(2017,2018)
   requests <- lapply(years, function(y) {
     list(
       "dataset_short_name" = "reanalysis-era5-pressure-levels",
@@ -240,11 +268,22 @@ test_that("batch request tests", {
       "time"           = "00:00",
       "area"           = "50/9/51/10",
       "format"         = "netcdf",
-      "target"         = "era5-demo.nc")
+      "target"         = paste0(y, "-era5-demo.nc"))
   })
 
   expect_output(wf_request_batch(
     requests,
     user = "2088")
     )
+
+  requests_dup <- lapply(requests, function(r) {
+    r$target <- "era5.nc"
+    r
+  })
+
+  expect_error(wf_request_batch(
+    requests_dup,
+    user = "2088")
+  )
+
 })

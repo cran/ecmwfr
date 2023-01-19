@@ -19,11 +19,13 @@ opts <- options(keyring_warn_for_env_fallback = FALSE)
 
 # load the library
 library(ncdf4)
-library(raster)
 library(terra)
 library(maps)
 library(ecmwfr)
 
+# grab demo nc files
+ncfile <- list.files(system.file(package="ecmwfr"),"*.nc", recursive = TRUE, full.names = TRUE)
+ncfile <- ncfile[grepl("webapi.nc", ncfile)]
 ```
 
 # ecmwfr
@@ -91,20 +93,19 @@ ncfile <- wf_request(user    = "khrdev@outlook.com",
            verbose  = FALSE)
 ```
 
-```{r echo = FALSE}
-ncfile <- system.file(package = "ecmwfr","extdata/webapi.nc")
-```
-
 The download operation might take a while. A progress indicator will keep you informed on the status of your request. The download will expire after a default time out of one hour. You will be informed of where to track your job request on [the ECMWF website](https://apps.ecmwf.int/webmars/joblist/), and provided with a download url which can be used with the `wt_transfer()` funtion to download the data on a later moment. Keep in mind that you can only have 3 active downloads and 20 job items queued! 
 
 If the download is successful you can visualize one layer in the retrieved stack of temperatures at 2 meters using the plotting routine below.
 
-```{r fig.width = 7, fig.height = 7, eval = TRUE}
-s <- raster::stack(ncfile)
-print(s)
+```{r fig.width = 7, fig.height = 7}
+# Open NetCDF file and plot the data
+# (trap read error on mac - if gdal netcdf support is missing)
+r <- try(terra::rast(ncfile))
 
-raster::plot(s[[1]], main = "2 meter temperature (Kelvin)")
-maps::map("world", add = TRUE)
+if(!inherits(r, "try-error")) {
+  terra::plot(r[[1]], main = "2 meter temperature (Kelvin)")
+  maps::map("world", add = TRUE)
+}
 ```
 
 ## ECMWF mars Requests
