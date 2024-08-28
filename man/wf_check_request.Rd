@@ -4,12 +4,9 @@
 \alias{wf_check_request}
 \title{check ECMWF / CDS data requests}
 \usage{
-wf_check_request(user, request)
+wf_check_request(request)
 }
 \arguments{
-\item{user}{user (email address) used to sign up for the ECMWF data service,
-used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}}
-
 \item{request}{nested list with query parameters following the layout
 as specified on the ECMWF API page}
 }
@@ -17,11 +14,13 @@ as specified on the ECMWF API page}
 a data frame with the determined service and url service endpoint
 }
 \description{
-Check the validaty of a data request, and login credentials.
+Check the validity of a data request by comparing the main dataset
+to the list provided by \code{\link[ecmwfr]{wf_datasets}}
 }
 \seealso{
 \code{\link[ecmwfr]{wf_set_key}}
-\code{\link[ecmwfr]{wf_transfer}},\code{\link[ecmwfr]{wf_request}}
+\code{\link[ecmwfr]{wf_transfer}},\code{\link[ecmwfr]{wf_request}},
+\code{\link[ecmwfr]{wf_transfer}}
 }
 \author{
 Koen Hufkens

@@ -13,45 +13,39 @@ library(maps)
 library(ecmwfr)
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  # set a key to the keychain interactively
-#  user <- wf_set_key(service = "webapi")
-
-## ----eval = FALSE-------------------------------------------------------------
-#  list(stream  = "oper",
-#       levtype = "sfc",
-#       param   = "167.128",
-#       dataset = "interim",
-#       step    = "0",
-#       grid    = "0.75/0.75",
-#       time    = "00",
-#       date    = "2014-07-01/to/2014-07-02",
-#       type    = "an",
-#       class   = "ei",
-#       area    = "73.5/-27/33/45",
-#       format  = "netcdf",
-#       target  = "tmp.nc") %>%
-#    wf_request(user = user, path = "~")
+#  list(
+#        product_type = 'reanalysis',
+#        variable = 'geopotential',
+#        year = '2024',
+#        month = '03',
+#        day = '01',
+#        time = '13:00',
+#        pressure_level = '1000',
+#        data_format = 'grib',
+#        dataset_short_name = 'reanalysis-era5-pressure-levels',
+#        target = 'test.grib'
+#  ) |>
+#    wf_request(path = "~")
 
 ## ----eval = FALSE-------------------------------------------------------------
 #  # this is an example of a request
 #  dynamic_request <- wf_archetype(
 #    request = list(
-#    "dataset_short_name" = "reanalysis-era5-pressure-levels",
-#    "product_type"   = "reanalysis",
-#    "variable"       = "temperature",
-#    "pressure_level" = "850",
-#    "year"           = "2000",
-#    "month"          = "04",
-#    "day"            = "04",
-#    "time"           = "00:00",
-#    "area"           = "70/-20/30/60",
-#    "format"         = "netcdf",
-#    "target"         = "era5-demo.nc"
+#        product_type = 'reanalysis',
+#        variable = 'geopotential',
+#        year = '2024',
+#        month = '03',
+#        day = '01',
+#        time = '13:00',
+#        pressure_level = '1000',
+#        data_format = 'grib',
+#        dataset_short_name = 'reanalysis-era5-pressure-levels',
+#        target = 'test.grib'
 #    ),
-#    dynamic_fields = c("area","day"))
+#    dynamic_fields = c("day", "target"))
 #  
 #  # change the day of the month
-#  dynamic_request(day = "01")
+#  dynamic_request(day = "01", target = "new.grib")
 
 ## ----eval = FALSE-------------------------------------------------------------
 #  # creating a list of requests using wf_archetype()
@@ -66,7 +60,50 @@ library(ecmwfr)
 #  # can't exceed 20)
 #  wf_request_batch(
 #    batch_request,
-#    workers = 2,
-#    user = user
+#    workers = 2
 #    )
+
+## ----eval=FALSE---------------------------------------------------------------
+#  # CDS
+#  cds_request <-
+#    list(
+#        product_type = 'reanalysis',
+#        variable = 'geopotential',
+#        year = '2024',
+#        month = '03',
+#        day = '01',
+#        time = '13:00',
+#        pressure_level = '1000',
+#        data_format = 'grib',
+#        dataset_short_name = 'reanalysis-era5-pressure-levels',
+#        target = 'test.grib'
+#  )
+#  
+#  # ADS
+#  ads_request <- list(
+#    dataset_short_name = "cams-global-radiative-forcings",
+#    variable = "radiative_forcing_of_carbon_dioxide",
+#    forcing_type = "instantaneous",
+#    band = "long_wave",
+#    sky_type = "all_sky",
+#    level = "surface",
+#    version = "2",
+#    year = "2018",
+#    month = "06",
+#    target = "download.grib"
+#  )
+#  
+#  
+#  combined_request <- list(
+#    cds_request,
+#    ads_request
+#  )
+#  
+#  
+#  files <- wf_request_batch(
+#    combined_request
+#    )
+
+## ----eval=FALSE---------------------------------------------------------------
+#   Sys.setenv(ecmwfr_PAT="abcd1234-foo-bar-98765431-XXXXXXXXXX")
 

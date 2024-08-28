@@ -1,10 +1,10 @@
 ---
-title: "Advanced Use Cases"
+title: "Advanced Features"
 author: "Koen Hufkens"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Advanced Use Cases}
+  %\VignetteIndexEntry{Advanced Features}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -24,48 +24,28 @@ library(maps)
 library(ecmwfr)
 ```
 
-# Advanced Use Cases
+# Advanced Features
 
 This is a brief overview of some of the more advanced options in the `ecmwfr` package.
-
-## Setup
-
-A 'hidden' feature of the `wf_set_key()` function is that it returns the user name upon success. This allows for easier integration in scripts shared with users (which have different credentials)
-
-```{r eval = FALSE}
-# set a key to the keychain interactively
-user <- wf_set_key(service = "webapi")
-```
-
-## Formatting requests 
-
-The conversion from a MARS or python based queries (formed on the ECMWF or Copernicus CDS websites) to the list format used by `ecmwfr` can be automated if you use the RStudio based Addin. 
-
-By selecting and using Addin -> Mars to list (or 'Python to list') you dynamically convert queries copied from either ECMWF or CDS based services.
-
-![](https://user-images.githubusercontent.com/1354258/56429601-ced94100-62c3-11e9-82f3-ae2cd03d06f5.gif)
-
-Using the `Addin` is the sure way to form a proper `ecmwfr` request and avoids typos. As such, we recommend the use of the `Addin`.
 
 ## Piped requests
 
 Another hidden feature of `ecmwfr` is the fact that the request is the first argument in the `wf_request()` function. This means that any valid list can be piped into this function (using the %>% or pipe symbol).
 
 ```{r eval = FALSE}
-list(stream  = "oper",
-     levtype = "sfc",
-     param   = "167.128",
-     dataset = "interim",
-     step    = "0",
-     grid    = "0.75/0.75",
-     time    = "00",
-     date    = "2014-07-01/to/2014-07-02",
-     type    = "an",
-     class   = "ei",
-     area    = "73.5/-27/33/45",
-     format  = "netcdf",
-     target  = "tmp.nc") %>%
-  wf_request(user = user, path = "~")
+list(
+      product_type = 'reanalysis',
+      variable = 'geopotential',
+      year = '2024',
+      month = '03',
+      day = '01',
+      time = '13:00',
+      pressure_level = '1000',
+      data_format = 'grib',
+      dataset_short_name = 'reanalysis-era5-pressure-levels',
+      target = 'test.grib'
+) |>
+  wf_request(path = "~")
 ```
 
 ## Dynamic request functions / archetypes
@@ -78,22 +58,21 @@ The `wf_archetype()` function creates a new function with as parameters the dyna
 # this is an example of a request
 dynamic_request <- wf_archetype(
   request = list(
-  "dataset_short_name" = "reanalysis-era5-pressure-levels",
-  "product_type"   = "reanalysis",
-  "variable"       = "temperature",
-  "pressure_level" = "850",
-  "year"           = "2000",
-  "month"          = "04",
-  "day"            = "04",
-  "time"           = "00:00",
-  "area"           = "70/-20/30/60",
-  "format"         = "netcdf",
-  "target"         = "era5-demo.nc"
+      product_type = 'reanalysis',
+      variable = 'geopotential',
+      year = '2024',
+      month = '03',
+      day = '01',
+      time = '13:00',
+      pressure_level = '1000',
+      data_format = 'grib',
+      dataset_short_name = 'reanalysis-era5-pressure-levels',
+      target = 'test.grib'
   ),
-  dynamic_fields = c("area","day"))
+  dynamic_fields = c("day", "target"))
 
 # change the day of the month
-dynamic_request(day = "01")
+dynamic_request(day = "01", target = "new.grib")
 ```
 
 ## Batch (parallel) requests
@@ -113,12 +92,71 @@ batch_request <- list(
 # can't exceed 20)
 wf_request_batch(
   batch_request,
-  workers = 2,
-  user = user
+  workers = 2
+  )
+```
+
+### Mixing data services in batch requests
+
+It is allowed to mix data services in a batch requests. This allows you to formulate complex multi-service requests. Below you see a simple example using a batch requests for data from both the CDS and ADS services in one pass.
+
+```{r eval=FALSE}
+# CDS
+cds_request <-
+  list(
+      product_type = 'reanalysis',
+      variable = 'geopotential',
+      year = '2024',
+      month = '03',
+      day = '01',
+      time = '13:00',
+      pressure_level = '1000',
+      data_format = 'grib',
+      dataset_short_name = 'reanalysis-era5-pressure-levels',
+      target = 'test.grib'
+)
+
+# ADS
+ads_request <- list(
+  dataset_short_name = "cams-global-radiative-forcings",
+  variable = "radiative_forcing_of_carbon_dioxide",
+  forcing_type = "instantaneous",
+  band = "long_wave",
+  sky_type = "all_sky",
+  level = "surface",
+  version = "2",
+  year = "2018",
+  month = "06",
+  target = "download.grib"
+)
+
+
+combined_request <- list(
+  cds_request,
+  ads_request
+)
+
+
+files <- wf_request_batch(
+  combined_request
   )
 ```
 
 ## Date specification
 
 For those familiar to ECMWF _mars_ syntax: CDS/ADS does not
-accept `date = "2000-01-01/to/2000-12-31"` specifications at the moment. It is possible to specify one specific date via `date = "2000-01-01"` or multiple days via `date = ["2000-01-01","2000-01-02","2000-10-20"]` or `date = "YYYY-MM-DD/YYYY-MM-DD"` but not via `".../to/..."`. Specifying the date as a range allows you to sidestep the [ERA5T restricted access issue](https://confluence.ecmwf.int/pages/viewpage.action?pageId=277352608&focusedCommentId=278530169).
+accept `date = "2000-01-01/to/2000-12-31"` specifications at the moment. It is possible to specify one specific date via `date = "2000-01-01"` or multiple days via `date = ["2000-01-01","2000-01-02","2000-10-20"]` or `date = "YYYY-MM-DD/YYYY-MM-DD"` but not via `".../to/..."`.
+
+## Environmental variables
+
+Alternatively, you can set an environmental variable containing your Personal Access Token. 
+
+```{r eval=FALSE}
+ Sys.setenv(ecmwfr_PAT="abcd1234-foo-bar-98765431-XXXXXXXXXX")
+```
+
+This will need to be set at the beginning of each setting or added to the user
+`.Renviron` file. Overall,  this is considered insecure, but might be the only 
+option on some legacy or HPC systems to get full `ecmwfr` functionality. A good 
+blog post on why you should not do this is 
+provided by [Maëlle Salmon](https://blog.r-hub.io/2024/02/28/key-advantages-of-using-keyring/).
