@@ -1,6 +1,6 @@
 Package: ecmwfr
 Title: Interface to 'ECMWF' and 'CDS' Data Web Services
-Version: 2.0.0
+Version: 2.0.1
 Authors@R: c(person(
                family = "Hufkens",
                given = "Koen",
@@ -42,11 +42,11 @@ Suggests: rmarkdown, covr, xml2, testthat, terra, maps, ncdf4, knitr,
 VignetteBuilder: knitr
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2024-08-28 18:13:21 UTC; khufkens
+Packaged: 2024-09-20 12:34:31 UTC; khufkens
 Author: Koen Hufkens [aut, cre, cph] (<https://orcid.org/0000-0002-5070-8109>),
   Reto Stauffer [ctb] (<https://orcid.org/0000-0002-3798-5507>),
   Elio Campitelli [ctb] (<https://orcid.org/0000-0002-7742-9230>),
   BlueGreen Labs [fnd]
 Maintainer: Koen Hufkens <koen.hufkens@gmail.com>
 Repository: CRAN
-Date/Publication: 2024-08-28 23:20:12 UTC
+Date/Publication: 2024-09-20 12:50:08 UTC
