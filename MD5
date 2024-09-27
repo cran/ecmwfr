@@ -1,8 +1,8 @@
-62a853121af48b270c1604ec7efd3d69 *DESCRIPTION
+8badd72cd4ccd79e24a6efb0e5ed129f *DESCRIPTION
 54da189aced3adfbdf7bcacf9b6ac00b *NAMESPACE
 72541c8c32f8643973818468a3fb8bae *R/addin.R
 816f238aeccdcd5d8ae388f4a6ab5c3d *R/methods.R
-9e4c6cebf0d637570ee39ae7a5a03deb *R/service-ds.R
+2eb1f9c51345d76eb27fdda0f10c324b *R/service-ds.R
 c8b1763ef2e6d32445937fa14501e326 *R/service.R
 90d528484825ca77ea69340d341fa889 *R/wf_archetype.R
 146582f071f058ef09d633914f56f589 *R/wf_check_request.R
@@ -14,12 +14,12 @@ c96c485b8675a98379c2e055f3da1c54 *R/wf_request.R
 c868d28c3653dd56249e1f7dee358d9d *R/wf_request_batch.R
 8ddbb1a6f2de5340d9acc6138aabf03c *R/wf_set_key.R
 205553b530d94b87ecb4535e9875d5b2 *R/wf_transfer.R
-a32fd0bce5a6cc1d791bf8d83165f681 *R/zzz.R
+27bbd952bc4a99c34141ed5723150183 *R/zzz.R
 332b7ef44bea1156339cde25be549cd7 *build/vignette.rds
 c21c310284cca6a59d8aae4a87b558c0 *inst/CITATION
 53fb89b74ab964dc7c35aae3c0c0b85b *inst/doc/advanced_vignette.R
 17b550809013963df1f13ad59b386a63 *inst/doc/advanced_vignette.Rmd
-e8779a35c3eda60fe214923b6bee9539 *inst/doc/advanced_vignette.html
+ebaceb6e18658dc127298f23631a6902 *inst/doc/advanced_vignette.html
 7222093b14a7eeb87b769204d7f04151 *inst/extdata/ads.nc
 3bd125d67cc47d34322c3330fa1d92ef *inst/extdata/cds.nc
 b41fc6a841292ae0f6584564a1eb2d8e *inst/extdata/cds_workflow.nc
