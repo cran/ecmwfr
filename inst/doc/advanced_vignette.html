@@ -12,7 +12,7 @@
 
 <meta name="author" content="Koen Hufkens" />
 
-<meta name="date" content="2024-09-27" />
+<meta name="date" content="2025-02-10" />
 
 <title>Advanced Features</title>
 
@@ -62,7 +62,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Advanced Features</h1>
 <h4 class="author">Koen Hufkens</h4>
-<h4 class="date">2024-09-27</h4>
+<h4 class="date">2025-02-10</h4>
 
 
 
@@ -353,7 +353,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>Another hidden feature of <code>ecmwfr</code> is the fact that the
 request is the first argument in the <code>wf_request()</code> function.
 This means that any valid list can be piped into this function (using
-the %&gt;% or pipe symbol).</p>
+the magrittr <code>%&gt;%</code> or native pipe symbol
+<code>|&gt;</code>).</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">list</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>      <span class="at">product_type =</span> <span class="st">&#39;reanalysis&#39;</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>      <span class="at">variable =</span> <span class="st">&#39;geopotential&#39;</span>,</span>
@@ -378,9 +379,9 @@ naming the field which are to be set as dynamic.</p>
 as parameters the dynamic fields previously assigned. The below example
 show how to use the function to generate the custom
 <code>dynamic_request()</code> function. We then use this new function
-to alter the <code>area</code> and <code>day</code> fields and pipe
-(%&gt;%) into the <code>wf_request()</code> function to retrieve the
-data.</p>
+to alter the <code>day</code> and <code>target</code> fields and pipe
+(<code>|&gt;</code>) into the <code>wf_request()</code> function to
+retrieve the data.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># this is an example of a request</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>dynamic_request <span class="ot">&lt;-</span> <span class="fu">wf_archetype</span>(</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">request =</span> <span class="fu">list</span>(</span>
@@ -398,7 +399,8 @@ data.</p>
 <span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>  <span class="at">dynamic_fields =</span> <span class="fu">c</span>(<span class="st">&quot;day&quot;</span>, <span class="st">&quot;target&quot;</span>))</span>
 <span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a></span>
 <span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co"># change the day of the month</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="fu">dynamic_request</span>(<span class="at">day =</span> <span class="st">&quot;01&quot;</span>, <span class="at">target =</span> <span class="st">&quot;new.grib&quot;</span>)</span></code></pre></div>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="fu">dynamic_request</span>(<span class="at">day =</span> <span class="st">&quot;01&quot;</span>, <span class="at">target =</span> <span class="st">&quot;new.grib&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  <span class="fu">wf_request</span>()</span></code></pre></div>
 </div>
 <div id="batch-parallel-requests" class="section level2">
 <h2>Batch (parallel) requests</h2>
@@ -482,10 +484,10 @@ the moment. It is possible to specify one specific date via
 <code>date = &quot;YYYY-MM-DD/YYYY-MM-DD&quot;</code> but not via
 <code>&quot;.../to/...&quot;</code>.</p>
 </div>
-<div id="environmental-variables" class="section level2">
-<h2>Environmental variables</h2>
-<p>Alternatively, you can set an environmental variable containing your
-Personal Access Token.</p>
+<div id="environmental-variables-for-api-token" class="section level2">
+<h2>Environmental variables for API token</h2>
+<p>Alternatively to using <code>wf_set_key()</code>, you can set an
+environmental variable containing your API.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a> <span class="fu">Sys.setenv</span>(<span class="at">ecmwfr_PAT=</span><span class="st">&quot;abcd1234-foo-bar-98765431-XXXXXXXXXX&quot;</span>)</span></code></pre></div>
 <p>This will need to be set at the beginning of each setting or added to
 the user <code>.Renviron</code> file. Overall, this is considered

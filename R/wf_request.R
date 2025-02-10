@@ -12,7 +12,7 @@
 #' used to retrieve the token set by \code{\link[ecmwfr]{wf_set_key}}
 #' @param path path were to store the downloaded data
 #' @param time_out how long to wait on a download to start (default =
-#' \code{3*3600} seconds).
+#' \code{3600} seconds).
 #' @param retry polling frequency of submitted request for downloading (default =
 #' \code{30} seconds).
 #' @param transfer logical, download data TRUE or FALSE (default = TRUE)
@@ -122,8 +122,8 @@ wf_request <- function(
             service_info$user)
   }
 
-  # grab filename
-  filename <- file.path(path, request$target)
+  # grab filename for verbose output
+  filename <- request$target
 
   # Create request and submit to service
   request <- ds_service$new(

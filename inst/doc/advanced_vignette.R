@@ -45,7 +45,8 @@ library(ecmwfr)
 #    dynamic_fields = c("day", "target"))
 #  
 #  # change the day of the month
-#  dynamic_request(day = "01", target = "new.grib")
+#  dynamic_request(day = "01", target = "new.grib") |>
+#    wf_request()
 
 ## ----eval = FALSE-------------------------------------------------------------
 #  # creating a list of requests using wf_archetype()

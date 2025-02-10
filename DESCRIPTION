@@ -1,6 +1,6 @@
 Package: ecmwfr
 Title: Interface to 'ECMWF' and 'CDS' Data Web Services
-Version: 2.0.2
+Version: 2.0.3
 Authors@R: c(person(
                family = "Hufkens",
                given = "Koen",
@@ -33,7 +33,7 @@ Description: Programmatic interface to the European Centre for Medium-Range
 URL: https://github.com/bluegreen-labs/ecmwfr
 BugReports: https://github.com/bluegreen-labs/ecmwfr/issues
 Depends: R (>= 4.2)
-Imports: httr, memoise, getPass, R6, keyring
+Imports: httr, memoise, getPass, R6, keyring, tools
 License: AGPL-3
 ByteCompile: true
 RoxygenNote: 7.3.1
@@ -42,11 +42,11 @@ Suggests: rmarkdown, covr, xml2, testthat, terra, maps, ncdf4, knitr,
 VignetteBuilder: knitr
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2024-09-27 09:20:13 UTC; khufkens
+Packaged: 2025-02-10 11:28:47 UTC; khufkens
 Author: Koen Hufkens [aut, cre, cph] (<https://orcid.org/0000-0002-5070-8109>),
   Reto Stauffer [ctb] (<https://orcid.org/0000-0002-3798-5507>),
   Elio Campitelli [ctb] (<https://orcid.org/0000-0002-7742-9230>),
   BlueGreen Labs [fnd]
 Maintainer: Koen Hufkens <koen.hufkens@gmail.com>
 Repository: CRAN
-Date/Publication: 2024-09-27 13:30:02 UTC
+Date/Publication: 2025-02-10 12:00:02 UTC

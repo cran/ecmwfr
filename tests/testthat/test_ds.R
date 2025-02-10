@@ -221,6 +221,27 @@ test_that("required arguments missing for cds_* functions", {
     simplify = FALSE)))
 })
 
+test_that("rename output routine", {
+  skip_on_cran()
+  skip_if(login_check)
+
+  request <- list(
+    dataset_short_name = "reanalysis-era5-single-levels-monthly-means",
+    product_type = "monthly_averaged_reanalysis",
+    variable = c("2m_temperature"),
+    year = c("2020","2018"),
+    month = c("01", "02"),
+    time = "00:00",
+    data_format = "netcdf",
+    grid = c("1", "1"),
+    download_format = "unarchived"
+  )
+
+  expect_output(
+    wf_request(request)
+  )
+})
+
 test_that("batch request tests", {
   skip_on_cran()
   skip_if(login_check)
